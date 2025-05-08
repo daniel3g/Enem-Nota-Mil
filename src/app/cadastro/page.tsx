@@ -48,7 +48,8 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/emailConfirm')
+      alert('Cadastro realizado com Sucesso!')
+      router.push('/login')
     } catch (err) {
       console.error('Erro ao cadastrar:', err)
       setError('Erro interno no cadastro.')
@@ -86,7 +87,7 @@ export default function LoginPage() {
           <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
 
           <label htmlFor='password' className='text-gray-500 text-sm'>Senha:</label>
-          <div className='relative flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative bg-gray-100 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
               className='w-full bg-gray-100 m-auto p-3 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
@@ -101,7 +102,7 @@ export default function LoginPage() {
           </div>
 
           <label htmlFor='confirmPassword' className='text-gray-500 text-sm'>Confirmar Senha:</label>
-          <div className='relative flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative bg-gray-100 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
               className='w-full bg-gray-100 m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
@@ -119,7 +120,7 @@ export default function LoginPage() {
 
           <p className='text-gray-500 text-xs mb-5'>Ao se cadastrar, você aceita nossos termos de uso e a nossa política de privacidade.</p>
 
-          <button type='submit' className='bg-primary_blue p-4 rounded-sm mt-2 text-xl'>Cadastrar</button>
+          <button type='submit' className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white'>Cadastrar</button>
 
           <a href='/login'>
             <div className='flex bg-gray-100 flex-col sm:w-full p-4 mt-5 rounded-md'>

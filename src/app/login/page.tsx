@@ -34,7 +34,7 @@ export default function LoginPage() {
           <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' id="email" name="email" type="email" required />
           <label className='text-gray-500 text-sm' htmlFor="password">Senha:</label>
           <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' id="password" name="password" type="password" required />
-          <button className='bg-primary_blue p-4 rounded-sm mt-2 text-xl' formAction={login}>Entrar</button>
+          <button className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white' formAction={login}>Entrar</button>
 
           <a href="/cadastro"><div className='flex flex-col bg-gray-100 sm:w-full p-4 mt-5 rounded-md'>
             <p className='text-gray-500'>Ainda não possui uma conta?</p>
