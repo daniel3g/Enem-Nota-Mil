@@ -5,6 +5,10 @@ import { signup } from './actions'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import Image from "next/image";
+import logo from '../../../public/images/logo.webp';
+import ImageStudent from '../../../public/images/adolescente-estudando.webp'
+
 
 export default function LoginPage() {
   const router = useRouter()
@@ -55,26 +59,36 @@ export default function LoginPage() {
     <div className='flex w-full h-screen'>
       <div className='hidden sm:block w-2/3 h-screen relative'>
         <div className='absolute inset-0 w-full h-full'>
-          
+          <Image
+            src={ImageStudent}
+            alt="Astronauta do Futuro Estudai"
+            layout="fill"
+            objectFit="cover"
+            className="-z-10 brightness-50"
+          />
         </div>
       </div>
       <div className='flex flex-col w-full justify-center items-center sm:w-1/3'>
         <a href='/'>
-         
+          <Image
+            src={logo}
+            alt="Logo Torgansa"
+            height={60}
+          />
         </a>
         <form className='flex flex-col w-full p-3 sm:w-96' onSubmit={handleSubmit}>
           <h2 className='mb-8 text-lg'>Cadastre-se agora</h2>
 
           <label htmlFor='nome' className='text-gray-500 text-sm'>Nome Completo:</label>
-          <input className='flex bg-gray-900 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
+          <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
 
           <label htmlFor='email' className='text-gray-500 text-sm'>Email:</label>
-          <input className='flex bg-gray-900 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
+          <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
 
           <label htmlFor='password' className='text-gray-500 text-sm'>Senha:</label>
-          <div className='relative flex bg-gray-900 mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
-              className='w-full m-auto p-3 bg-transparent focus:outline-none'
+              className='w-full bg-gray-100 m-auto p-3 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='password'
               name='password'
@@ -87,9 +101,9 @@ export default function LoginPage() {
           </div>
 
           <label htmlFor='confirmPassword' className='text-gray-500 text-sm'>Confirmar Senha:</label>
-          <div className='relative flex bg-gray-900 mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
-              className='w-full m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
+              className='w-full bg-gray-100 m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='confirmPassword'
               name='confirmPassword'
@@ -108,7 +122,7 @@ export default function LoginPage() {
           <button type='submit' className='bg-primary_blue p-4 rounded-sm mt-2 text-xl'>Cadastrar</button>
 
           <a href='/login'>
-            <div className='flex flex-col bg-gray-900 sm:w-full p-4 mt-5 rounded-md'>
+            <div className='flex bg-gray-100 flex-col sm:w-full p-4 mt-5 rounded-md'>
               <p className='text-gray-500'>Já possui uma conta?</p>
               <p className='text-primary_blue'>Entre na plataforma!</p>
             </div>
