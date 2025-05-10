@@ -5,6 +5,8 @@ import { signup } from './actions'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { LuEyeClosed, LuEye } from "react-icons/lu"
+
 import Image from "next/image";
 import logo from '../../../public/images/logo.webp';
 import ImageStudent from '../../../public/images/adolescente-estudando.webp'
@@ -48,8 +50,7 @@ export default function LoginPage() {
         return
       }
 
-      alert('Cadastro realizado com Sucesso!')
-      router.push('/login')
+      router.push('/email-confirm')
     } catch (err) {
       console.error('Erro ao cadastrar:', err)
       setError('Erro interno no cadastro.')
@@ -97,7 +98,7 @@ export default function LoginPage() {
               required
             />
             <button type='button' onClick={togglePasswordVisibility} className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'>
-              
+            {showPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
@@ -112,7 +113,7 @@ export default function LoginPage() {
               required
             />
             <button type='button' onClick={toggleConfirmPasswordVisibility} className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'>
-             
+            {showConfirmPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
