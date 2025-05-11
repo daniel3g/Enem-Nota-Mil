@@ -14,7 +14,6 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    // redirecionar se quiser, aqui ainda está rodando no server
     return { error }
   }
 
@@ -25,19 +24,14 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData): Promise<{ error: Error | null }> {
   const supabase = await createClient()
 
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
 
-  const { error } = await supabase.auth.signUp(data)
+  const { error } = await supabase.auth.signUp({ email, password })
 
-  if (!error) {
-    revalidatePath('/', 'layout')
-  }
-
-  return { error } // ⬅️ Retorna sempre, não redireciona
+  return { error }
 }
+
 
 export async function signOut() {
   const supabase = await createClient()

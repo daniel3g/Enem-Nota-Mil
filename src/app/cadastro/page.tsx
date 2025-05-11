@@ -83,6 +83,16 @@ export default function LoginPage() {
 
           <label htmlFor='nome' className='text-gray-500 text-sm'>Nome Completo:</label>
           <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
+          
+          <label htmlFor='phone' className='text-gray-500 text-sm'>Celular:</label>
+          <input
+            className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            placeholder='(11) 91234-5678'
+            id='phone'
+            name='phone'
+            type='tel'
+            required
+          />
 
           <label htmlFor='email' className='text-gray-500 text-sm'>Email:</label>
           <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
