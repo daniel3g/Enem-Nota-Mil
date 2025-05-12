@@ -3,7 +3,6 @@ import { createClient } from '../../../utils/supabase/server'
 import { signOut } from '../../app/login/actions'
 
 import RedacaoForm from '@/components/RedacaoForm'
-import CheckProfileRedirect from '@/components/CheckProfileRedirect'
 
 import Image from 'next/image'
 import Logo from '../../../public/images/logo.webp'
@@ -29,7 +28,6 @@ export default async function PrivatePage() {
 
   return (
     <div>
-      <CheckProfileRedirect />
       <header className='flex p-4 border-b'>
         <Image src={Logo} alt='Logo Enem Nota Mil' height={60} />
       </header>
