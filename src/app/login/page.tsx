@@ -30,7 +30,7 @@ export default function LoginPage() {
         <a href='/'>
           <Image
             src={logo}
-            alt="Logo Torgansa"
+            alt="Logo Enem Nota Mil"
             height={60}
           />
         </a>
@@ -40,7 +40,7 @@ export default function LoginPage() {
 
           <label className='text-gray-500 text-sm' htmlFor="email">Email:</label>
           <input
-            className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
             id="email"
             name="email"
             type="email"
@@ -48,9 +48,9 @@ export default function LoginPage() {
           />
 
           <label className='text-gray-500 text-sm' htmlFor="password">Senha:</label>
-          <div className='relative bg-gray-100 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
-              className='w-full bg-gray-100 p-3 bg-transparent focus:outline-none'
+              className='w-full bg-gray-200 p-3 bg-transparent focus:outline-none'
               id="password"
               name="password"
               type={showPassword ? 'text' : 'password'}
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <button className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white' formAction={login}>Entrar</button>
 
           <a href="/cadastro">
-            <div className='flex flex-col bg-gray-100 sm:w-full p-4 mt-5 rounded-md'>
+            <div className='flex flex-col bg-gray-200 sm:w-full p-4 mt-5 rounded-md'>
               <p className='text-gray-500'>Ainda não possui uma conta?</p>
               <p className='text-primary_blue'>Se inscreva agora!</p>
             </div>

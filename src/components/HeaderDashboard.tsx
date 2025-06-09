@@ -49,7 +49,7 @@ export default async function PrivatePage() {
             </div>
           </Link>
 
-          <Link href="/dashboard">
+          <Link href="/ebooks">
             <div className='flex items-center gap-2 py-2 px-5 text-lg rounded-md hover:bg-customPurple hover:text-white'>
               <PiBooksLight /> Meus Ebooks
             </div>
@@ -61,7 +61,7 @@ export default async function PrivatePage() {
                 src={AvatarDefault}
                 alt='Foto de perfil'
                 width={40}
-                height={40}
+                height={40} 
                 className='rounded-full'
               />
             <span className='text-gray-800 font-medium'>Bem-vindo, {firstName}</span>

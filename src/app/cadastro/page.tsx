@@ -74,7 +74,7 @@ export default function LoginPage() {
         <a href='/'>
           <Image
             src={logo}
-            alt="Logo Torgansa"
+            alt="Logo Enem Nota Mil"
             height={60}
           />
         </a>
@@ -82,11 +82,11 @@ export default function LoginPage() {
           <h2 className='mb-8 text-lg'>Cadastre-se agora</h2>
 
           <label htmlFor='nome' className='text-gray-500 text-sm'>Nome Completo:</label>
-          <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
+          <input className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
           
           <label htmlFor='phone' className='text-gray-500 text-sm'>Celular:</label>
           <input
-            className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
             placeholder='(11) 91234-5678'
             id='phone'
             name='phone'
@@ -95,12 +95,12 @@ export default function LoginPage() {
           />
 
           <label htmlFor='email' className='text-gray-500 text-sm'>Email:</label>
-          <input className='flex bg-gray-100 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
+          <input className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
 
           <label htmlFor='password' className='text-gray-500 text-sm'>Senha:</label>
-          <div className='relative bg-gray-100 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
-              className='w-full bg-gray-100 m-auto p-3 bg-transparent focus:outline-none'
+              className='w-full bg-gray-200 m-auto p-3 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='password'
               name='password'
@@ -113,9 +113,9 @@ export default function LoginPage() {
           </div>
 
           <label htmlFor='confirmPassword' className='text-gray-500 text-sm'>Confirmar Senha:</label>
-          <div className='relative bg-gray-100 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
             <input
-              className='w-full bg-gray-100 m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
+              className='w-full bg-gray-200 m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='confirmPassword'
               name='confirmPassword'
@@ -134,7 +134,7 @@ export default function LoginPage() {
           <button type='submit' className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white'>Cadastrar</button>
 
           <a href='/login'>
-            <div className='flex bg-gray-100 flex-col sm:w-full p-4 mt-5 rounded-md'>
+            <div className='flex bg-gray-200 flex-col sm:w-full p-4 mt-5 rounded-md'>
               <p className='text-gray-500'>Já possui uma conta?</p>
               <p className='text-primary_blue'>Entre na plataforma!</p>
             </div>

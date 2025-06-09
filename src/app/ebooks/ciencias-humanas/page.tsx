@@ -7,7 +7,7 @@ export default async function EbookPage() {
 
   const { data } = await supabase.storage
     .from('ebooks')
-    .createSignedUrl('as-4-matrizes-de-conhecimento-enem.pdf', 60 * 5) // 5 min
+    .createSignedUrl('ciencias-humanas.pdf', 60 * 5) // 5 min
 
   if (!data?.signedUrl) {
     return <p>Erro ao carregar o PDF</p>
@@ -17,7 +17,7 @@ export default async function EbookPage() {
     <div>
       <HeaderDashboard />
       <main className="flex flex-col w-4/5 m-auto py-10">
-        <h1 className="text-2xl font-bold mb-4">Visualizando: As 4 Matrizes de Conhecimento</h1>
+        <h1 className="text-2xl font-bold mb-4">Visualizando: Ciências Humanas</h1>
         <PDFViewer url={data.signedUrl} />
       </main>
     </div>
