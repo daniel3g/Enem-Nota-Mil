@@ -58,7 +58,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='flex w-full h-screen'>
+    <div className='flex w-full h-full'>
       <div className='hidden sm:block w-2/3 h-screen relative'>
         <div className='absolute inset-0 w-full h-full'>
           <Image
