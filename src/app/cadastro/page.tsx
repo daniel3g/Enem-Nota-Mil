@@ -9,7 +9,7 @@ import { LuEyeClosed, LuEye } from "react-icons/lu"
 
 import Image from "next/image";
 import logo from '../../../public/images/logo.webp';
-import ImageStudent from '../../../public/images/adolescente-estudando.webp'
+import ImageStudent from '../../../public/images/bg-login.webp'
 
 
 export default function LoginPage() {
