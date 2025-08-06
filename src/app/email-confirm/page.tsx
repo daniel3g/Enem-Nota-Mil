@@ -8,11 +8,8 @@ export default function EmailConfirm() {
       {/* Texto */}
       <div className="w-full sm:w-1/2 text-center sm:text-left">
         <h1 className="text-2xl font-semibold">Obrigado pelo seu registro!</h1>
-        <p className="mt-5 text-base">
-          Enviamos um email com um link para confirmação de sua conta.
-        </p>
         <p className="text-base">
-          Por favor, verifique seu email e clique no link para começar a usar nossa plataforma.
+          Por favor, clique no botão abaixo para acessar a página de login.
         </p>
         <Link href="/login">
           <button className="bg-customPurple mt-5 py-3 px-8 sm:px-12 rounded-md text-white text-lg">
