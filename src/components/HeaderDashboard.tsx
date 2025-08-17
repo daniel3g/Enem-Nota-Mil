@@ -10,6 +10,8 @@ import Image from 'next/image'
 import Logo from '../../public/images/logo.webp'
 import AvatarDefault from '../../public/images/avatar.png'
 
+import ClientBalanceBadge from "@/components/ClientBalanceBadge";
+
 export default async function PrivatePage() {
   const supabase = await createClient()
 
@@ -25,6 +27,14 @@ export default async function PrivatePage() {
     .select('full_name')
     .eq('id', user.id)
     .single()
+
+  const { data: balanceRow } = await supabase
+    .from('user_credit_balance')
+    .select('balance')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  const balance = balanceRow?.balance ?? 0;
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Usuário'
 
@@ -43,7 +53,7 @@ export default async function PrivatePage() {
             </div>
           </Link>      
 
-          <Link href="/redacao">
+          <Link href="/minhas-redacoes">
             <div className='flex items-center gap-2 py-2 px-5 text-lg rounded-md hover:bg-customPurple hover:text-white'>
               <BsFileText /> Minhas redações
             </div>
@@ -56,6 +66,7 @@ export default async function PrivatePage() {
           </Link>    
         </div>
         <div className='flex justify-end w-1/4 items-center gap-5'>
+        <ClientBalanceBadge initial={balance} />
           <div className='flex gap-3 items-center'>
             <Image
                 src={AvatarDefault}

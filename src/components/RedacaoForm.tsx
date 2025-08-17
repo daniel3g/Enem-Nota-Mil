@@ -3,36 +3,51 @@
 import { useState } from 'react';
 
 interface RedacaoFormProps {
-  email: string;
+  email: string; // não é mais necessário, mas mantive compatível
 }
 
 const RedacaoForm = ({ email }: RedacaoFormProps) => {
   const [redaction, setRedaction] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setResponseMessage('');
+    if (!redaction.trim()) {
+      setResponseMessage('Digite o conteúdo da redação.');
+      return;
+    }
 
-    const webhookUrl = 'https://workflows.guarumidia.com/webhook/47c137f1-3e87-4aed-acca-ec741a2c95a4';
-    const payload = { email, redaction };
-
+    setBusy(true);
     try {
-      const response = await fetch(webhookUrl, {
+      // Agora chamamos a sua API interna: debita 1 crédito + cria 'queued' + envia ao n8n
+      const res = await fetch('/api/essays', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: null,
+          content: redaction,
+        }),
       });
 
-      if (response.ok) {
+      const data = await res.json();
+
+      if (!res.ok) {
+        setResponseMessage(data?.error || 'Erro ao enviar redação.');
+      } else {
         setResponseMessage('Redação enviada com sucesso!');
         setRedaction('');
-      } else {
-        throw new Error('Erro ao enviar redação');
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('credits:changed'));
+        }
       }
-    } catch (error) {
+    } catch {
       setResponseMessage('Erro ao enviar redação. Por favor, tente novamente.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -54,9 +69,10 @@ const RedacaoForm = ({ email }: RedacaoFormProps) => {
         </div>
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-customPurple text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          disabled={busy || !redaction.trim()}
+          className="w-full py-2 px-4 bg-customPurple text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
         >
-          Enviar Redação
+          {busy ? 'Enviando…' : 'Enviar Redação (–1 crédito)'}
         </button>
       </form>
       {responseMessage && (
