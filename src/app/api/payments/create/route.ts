@@ -21,8 +21,20 @@ function addDays(base: Date, days: number) {
 }
 
 export async function POST(req: Request) {
-  // usa teu util SSR que já lê os cookies do Next
   const supabase = await createSupabaseServer();
+
+  console.log(
+    "[payments/create] ENV CHECK:",
+    "ASAAS_BASE_URL:", process.env.ASAAS_BASE_URL,
+    "ASAAS_API_KEY_LEN:", process.env.ASAAS_API_KEY?.length ?? 0
+  );
+
+  if (!process.env.ASAAS_API_KEY || !process.env.ASAAS_BASE_URL) {
+    return NextResponse.json(
+      { error: "Configuração do Asaas ausente. Defina ASAAS_API_KEY e ASAAS_BASE_URL no .env.local" },
+      { status: 500 }
+    );
+  }
 
   try {
     // 1) Auth
@@ -34,40 +46,112 @@ export async function POST(req: Request) {
     const { packageKey } = BodySchema.parse(body);
     const pack = PACKS[packageKey];
 
-    // 3) Buscar profile com asaas_customer_id
-    const { data: profile, error: pErr } = await supabase
+    // 3) Garantir profile (agora incluindo cpf_cnpj)
+    let { data: profile, error: pErr } = await supabase
       .from("profiles")
-      .select("asaas_customer_id, full_name")
+      .select("id, full_name, cpf_cnpj, asaas_customer_id")
       .eq("id", user.id)
       .single();
 
     if (pErr || !profile) {
-      return NextResponse.json({ error: "Perfil não encontrado." }, { status: 400 });
+      const fallbackName =
+        (user.user_metadata?.full_name as string) ||
+        (user.user_metadata?.name as string) ||
+        (user.email?.split("@")[0] as string) ||
+        "Usuário";
+
+      const { data: upserted, error: upErr } = await supabase
+        .from("profiles")
+        .upsert({ id: user.id, full_name: fallbackName }, { onConflict: "id" })
+        .select("id, full_name, cpf_cnpj, asaas_customer_id")
+        .single();
+
+      if (upErr || !upserted) {
+        console.error("[payments/create] profiles upsert error:", upErr);
+        return NextResponse.json({ error: "Falha ao criar/recuperar perfil." }, { status: 400 });
+      }
+      profile = upserted;
     }
-    if (!profile.asaas_customer_id) {
+
+    // 3.1 Exigir CPF/CNPJ (seu Asaas está pedindo)
+    if (!profile.cpf_cnpj) {
       return NextResponse.json(
-        { error: "Usuário sem asaas_customer_id. Vincule o customer no Asaas." },
+        { error: "Para continuar, informe seu CPF/CNPJ no perfil." },
         { status: 400 }
       );
     }
 
-    // 4) Criar cobrança Asaas
+    // 3.2 Garantir customer Asaas com cpfCnpj
+    if (!profile.asaas_customer_id) {
+      const fallbackName =
+        profile.full_name ||
+        (user.user_metadata?.full_name as string) ||
+        (user.user_metadata?.name as string) ||
+        (user.email?.split("@")[0] as string) ||
+        "Usuário";
+
+      console.log("[payments/create] creating Asaas customer for:", user.email);
+
+      const customer = await asaas.post("/customers", {
+        name: fallbackName,
+        email: user.email,
+        cpfCnpj: profile.cpf_cnpj, // << envia CPF/CNPJ
+      });
+
+      const asaasId: string | undefined = customer?.data?.id;
+      if (!asaasId) {
+        console.error("[payments/create] Asaas customer response without id:", customer?.data);
+        return NextResponse.json({ error: "Falha ao criar cliente no Asaas." }, { status: 502 });
+      }
+
+      const { error: updErr } = await supabase
+        .from("profiles")
+        .update({ asaas_customer_id: asaasId })
+        .eq("id", user.id);
+
+      if (updErr) {
+        console.error("[payments/create] failed to persist asaas_customer_id:", updErr);
+        return NextResponse.json({ error: "Falha ao vincular asaas_customer_id ao perfil." }, { status: 400 });
+      }
+
+      profile.asaas_customer_id = asaasId;
+    } else {
+      // Se já existe customer e o CPF/CNPJ não está no Asaas, tentamos atualizar (best-effort)
+      try {
+        await asaas.put(`/customers/${profile.asaas_customer_id}`, {
+          cpfCnpj: profile.cpf_cnpj,
+        });
+      } catch (e: any) {
+        console.warn("[payments/create] warn: failed to update cpfCnpj on Asaas (continuando):", e?.response?.data ?? e);
+      }
+    }
+
+    // 4) Criar cobrança Asaas — trocando PIX -> UNDEFINED (ou BOLETO)
     const dueDate = addDays(new Date(), 3);
     const paymentPayload = {
-      customer: profile.asaas_customer_id,
-      billingType: "PIX", // ou "UNDEFINED" se preferir deixar a página decidir
+      customer: profile.asaas_customer_id!,
+      billingType: "UNDEFINED", // evita restrição do PIX na sua conta sandbox
       value: Number(pack.price.toFixed(2)),
       description: `${pack.description} - ${pack.credits} créditos`,
       dueDate,
       externalReference: `${user.id}:${packageKey}:${Date.now()}`,
     };
 
+    console.log("[payments/create] creating Asaas payment:", {
+      customer: paymentPayload.customer,
+      value: paymentPayload.value,
+      billingType: paymentPayload.billingType,
+      dueDate: paymentPayload.dueDate,
+    });
+
     const { data: asaasPayment } = await asaas.post("/payments", paymentPayload);
+
     const paymentId: string | undefined = asaasPayment?.id;
     const checkoutUrl: string | undefined =
       asaasPayment?.invoiceUrl || asaasPayment?.bankSlipUrl || asaasPayment?.transactionReceiptUrl;
 
     if (!paymentId || !checkoutUrl) {
+      console.error("[payments/create] Asaas payment missing id/checkoutUrl:", asaasPayment);
       return NextResponse.json({ error: "Falha ao gerar link de pagamento no Asaas." }, { status: 502 });
     }
 
@@ -86,6 +170,7 @@ export async function POST(req: Request) {
     });
 
     if (insErr) {
+      console.error("[payments/create] failed to insert into payments:", insErr);
       return NextResponse.json(
         {
           warning: "Pagamento criado no Asaas, mas falhou ao registrar em payments.",
@@ -96,7 +181,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 6) Retorno
     return NextResponse.json(
       { ok: true, checkoutUrl, externalPaymentId: paymentId },
       { status: 201 }
