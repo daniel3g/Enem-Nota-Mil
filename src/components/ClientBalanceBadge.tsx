@@ -10,7 +10,10 @@ export default function ClientBalanceBadge({ initial }: { initial: number }) {
     if (loadingRef.current) return;
     loadingRef.current = true;
     try {
-      const r = await fetch("/api/credits", { credentials: "include" });
+      const r = await fetch("/api/credits", {
+        credentials: "include",
+        cache: "no-store",           // 👈 evita cache do navegador
+      });
       const j = await r.json();
       if (r.ok && typeof j.balance === "number") {
         setBalance(j.balance);
@@ -21,11 +24,10 @@ export default function ClientBalanceBadge({ initial }: { initial: number }) {
   }
 
   useEffect(() => {
-    // Escuta eventos de alteração de crédito
     function onChanged() { refresh(); }
     window.addEventListener("credits:changed", onChanged);
 
-    // Fallback: polling leve a cada 20s
+    // Polling leve (20s). Se quiser, diminua para os primeiros 2-3 minutos pós-checkout.
     const id = setInterval(refresh, 20000);
 
     return () => {
