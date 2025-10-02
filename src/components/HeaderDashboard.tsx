@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { RxHome } from "react-icons/rx"
 import { BsFileText } from "react-icons/bs"
 import { PiBooksLight } from "react-icons/pi"
+import { MdAttachMoney } from "react-icons/md";
 
 import Image from 'next/image'
 import Logo from '../../public/images/logo.webp'
@@ -27,6 +28,16 @@ export default async function PrivatePage() {
     .select('full_name')
     .eq('id', user.id)
     .single()
+
+    let initial = 0;
+    if (user) {
+      const { data } = await supabase
+      .from("credit_transactions")
+      .select("amount")
+      .eq("user_id", user.id);
+
+    initial = (data ?? []).reduce((a, r: any) => a + (r.amount ?? 0), 0);
+  }
 
   const { data: balanceRow } = await supabase
     .from('user_credit_balance')
@@ -63,10 +74,16 @@ export default async function PrivatePage() {
             <div className='flex items-center gap-2 py-2 px-5 text-lg rounded-md hover:bg-customPurple hover:text-white'>
               <PiBooksLight /> Meus Ebooks
             </div>
+          </Link>
+
+          <Link href="/comprar">
+            <div className='flex items-center gap-2 py-2 px-5 text-lg rounded-md hover:bg-customPurple hover:text-white'>
+              <MdAttachMoney /> Comprar Créditos
+            </div>
           </Link>    
         </div>
         <div className='flex justify-end w-1/4 items-center gap-5'>
-        <ClientBalanceBadge initial={balance} />
+        <ClientBalanceBadge initial={initial} />
           <div className='flex gap-3 items-center'>
             <Image
                 src={AvatarDefault}

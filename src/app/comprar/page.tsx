@@ -1,62 +1,78 @@
-'use client'
+// app/comprar/page.tsx (trecho do botão comprar)
+"use client";
+import { useState } from "react";
 
-import { useState } from 'react'
+export default function Comprar() {
+  const [waiting, setWaiting] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>("");
 
-export default function ComprarPage() {
-  const [loading, setLoading] = useState<string | null>(null)
-
-  async function buyCredits(pkg: 'p1' | 'p5' | 'p10') {
-    try {
-      setLoading(pkg)
-      const res = await fetch('/api/payments/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packageKey: pkg }),
-      })
-
-      const data = await res.json()
-      console.log('Resposta do servidor:', data)
-
-      if (res.ok && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl // redireciona para o checkout do Asaas
-      } else {
-        alert('Erro: ' + (data.error || data.warning))
-      }
-    } catch (err) {
-      console.error(err)
-      alert('Falha inesperada ao criar pagamento')
-    } finally {
-      setLoading(null)
+  async function buy(packageKey: "p1"|"p5"|"p10") {
+    const r = await fetch("/api/payments/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ packageKey }),
+    });
+    const j = await r.json();
+    if (!r.ok) {
+      alert(j.error || "Erro ao criar pagamento");
+      if (j.error?.includes("CPF")) location.href = "/perfil?need=cpf=1";
+      return;
     }
+
+    const { checkoutUrl, externalPaymentId } = j;
+    // abre checkout em nova aba
+    window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+
+    // fica esperando nesta aba
+    setWaiting(externalPaymentId);
+    setStatus("pending");
+
+    // polling agressivo nos 90s iniciais, depois leve
+    const start = Date.now();
+    const timer = setInterval(async () => {
+      const rr = await fetch(`/api/payments/status?external=${externalPaymentId}`, { cache: "no-store" });
+      const jj = await rr.json();
+      if (rr.ok) {
+        setStatus(jj.status);
+        if (jj.status === "paid") {
+          clearInterval(timer);
+          // atualiza saldo do badge
+          window.dispatchEvent(new CustomEvent("credits:changed"));
+          alert("Pagamento confirmado! Créditos adicionados 🎉");
+          setWaiting(null);
+        }
+      }
+      if (Date.now() - start > 120000 && jj.status !== "paid") {
+        // reduz a frequência após 2min
+        clearInterval(timer);
+        const slow = setInterval(async () => {
+          const r2 = await fetch(`/api/payments/status?external=${externalPaymentId}`, { cache: "no-store" });
+          const j2 = await r2.json();
+          if (r2.ok && j2.status === "paid") {
+            clearInterval(slow);
+            window.dispatchEvent(new CustomEvent("credits:changed"));
+            alert("Pagamento confirmado! Créditos adicionados 🎉");
+            setWaiting(null);
+          }
+        }, 15000);
+      }
+    }, 3000);
   }
 
   return (
-    <div className="flex flex-col gap-4 p-10 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-4">Comprar Créditos</h1>
-
-      <button
-        onClick={() => buyCredits('p1')}
-        disabled={loading !== null}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        {loading === 'p1' ? 'Carregando...' : 'Pacote 1 crédito (R$ 9,90)'}
-      </button>
-
-      <button
-        onClick={() => buyCredits('p5')}
-        disabled={loading !== null}
-        className="bg-green-600 text-white px-4 py-2 rounded"
-      >
-        {loading === 'p5' ? 'Carregando...' : 'Pacote 5 créditos (R$ 39,90)'}
-      </button>
-
-      <button
-        onClick={() => buyCredits('p10')}
-        disabled={loading !== null}
-        className="bg-purple-600 text-white px-4 py-2 rounded"
-      >
-        {loading === 'p10' ? 'Carregando...' : 'Pacote 10 créditos (R$ 69,90)'}
-      </button>
+    <div className="p-6 space-y-4">
+      <button onClick={() => buy("p1")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
+      <button onClick={() => buy("p5")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
+      <button onClick={() => buy("p10")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
+      {waiting && (
+        <div className="mt-6 p-4 border rounded bg-yellow-50">
+          <b>Aguardando pagamento…</b>
+          <div>Status: {status}</div>
+          <div className="text-sm text-gray-600">
+            Finalize na aba do Asaas. Assim que for confirmado, seus créditos aparecem aqui.
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }

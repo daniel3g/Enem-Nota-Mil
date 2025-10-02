@@ -12,7 +12,7 @@ export default function ClientBalanceBadge({ initial }: { initial: number }) {
     try {
       const r = await fetch("/api/credits", {
         credentials: "include",
-        cache: "no-store",           // 👈 evita cache do navegador
+        cache: "no-store",      // 👈 evita cache do navegador
       });
       const j = await r.json();
       if (r.ok && typeof j.balance === "number") {
@@ -24,10 +24,13 @@ export default function ClientBalanceBadge({ initial }: { initial: number }) {
   }
 
   useEffect(() => {
+    // 🚀 atualiza imediatamente no mount
+    refresh();
+
     function onChanged() { refresh(); }
     window.addEventListener("credits:changed", onChanged);
 
-    // Polling leve (20s). Se quiser, diminua para os primeiros 2-3 minutos pós-checkout.
+    // Polling leve (pode reduzir para 10s nos 2 primeiros min, se quiser)
     const id = setInterval(refresh, 20000);
 
     return () => {
