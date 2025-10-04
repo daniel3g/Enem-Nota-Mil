@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import RedacaoForm from "@/components/RedacaoForm"
 import { createClient } from '../../../utils/supabase/server'
 
-import HeaderDashboard from '@/components/HeaderDashboard'
+import HeaderDashboard from '@/components/SidebarDashboard'
 
 export default async function Redacao() {
     const supabase = await createClient()

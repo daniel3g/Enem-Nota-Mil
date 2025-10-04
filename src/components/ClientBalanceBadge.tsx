@@ -41,7 +41,7 @@ export default function ClientBalanceBadge({ initial }: { initial: number }) {
 
   return (
     <span className="inline-flex items-center gap-2 border px-3 py-1 rounded text-sm">
-      Créditos: <b>{balance}</b>
+      <b>{balance}</b>
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import PDFViewer from '@/components/PDFViewer'
-import HeaderDashboard from '@/components/HeaderDashboard'
+import HeaderDashboard from '@/components/SidebarDashboard'
 import { createClient } from '../../../../utils/supabase/server'
 
 export default async function EbookPage() {

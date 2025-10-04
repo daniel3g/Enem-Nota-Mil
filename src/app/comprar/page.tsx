@@ -60,10 +60,44 @@ export default function Comprar() {
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <button onClick={() => buy("p1")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
-      <button onClick={() => buy("p5")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
-      <button onClick={() => buy("p10")} className="px-4 py-2 rounded bg-black text-white">Comprar p1</button>
+    <div className="flex flex-col w-full mx-8 my-3 bg-white border-t-4 rounded-lg border-customGreen p-6 space-y-4">
+      <strong className="text-xl">PREÇOS</strong>
+      <h2 className="text-3xl">PACOTES E PLANOS</h2>
+      <div className="flex w-full gap-6">
+        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
+          <strong>QUERO EXPERIMENTAR</strong>
+          <p>1 CRÉDITO</p>
+          <p>Utilize quando quiser</p>
+          <hr />
+          <strong>de R$ 25,90</strong>
+          <strong>por R$ 19,70</strong>
+          <p>1 correção detalhada</p>
+          <button onClick={() => buy("p1")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+        </div>
+        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
+          <strong>QUERO EXPERIMENTAR</strong>
+          <p>1 CRÉDITO</p>
+          <p>Utilize quando quiser</p>
+          <hr />
+          <strong>de R$ 25,90</strong>
+          <strong>por R$ 19,70</strong>
+          <p>1 correção detalhada</p>
+          <button onClick={() => buy("p5")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+        </div>
+        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
+          <strong>QUERO EXPERIMENTAR</strong>
+          <p>1 CRÉDITO</p>
+          <p>Utilize quando quiser</p>
+          <hr />
+          <strong>de R$ 25,90</strong>
+          <strong>por R$ 19,70</strong>
+          <p>1 correção detalhada</p>
+          <button onClick={() => buy("p10")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+        </div>
+      </div>
+      
+      
+      
       {waiting && (
         <div className="mt-6 p-4 border rounded bg-yellow-50">
           <b>Aguardando pagamento…</b>

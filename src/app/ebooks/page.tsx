@@ -1,4 +1,4 @@
-import HeaderDashboard from '@/components/HeaderDashboard'
+import HeaderDashboard from '@/components/SidebarDashboard'
 import Image from 'next/image'
 import Link from 'next/link'
 import capa4matrizes from '../../../public/images/capa-4-matrizes.webp'
