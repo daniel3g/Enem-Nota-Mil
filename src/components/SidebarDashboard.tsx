@@ -7,6 +7,7 @@ import { RxHome } from "react-icons/rx"
 import { BsFileText } from "react-icons/bs"
 import { PiBooksLight } from "react-icons/pi"
 import { MdAttachMoney } from "react-icons/md"
+import { RiStickyNoteAddLine } from "react-icons/ri";
 import { signOut } from '@/app/login/actions'
 import Logo from '../../public/images/logo.webp'
 import AvatarDefault from '../../public/images/avatar.png'
@@ -50,6 +51,7 @@ export default async function SidebarDashboard({
         <nav className="px-3 py-4 space-y-1">
           <NavItem href="/dashboard" icon={<RxHome />} label="Meu painel" />
           <NavItem href="/minhas-redacoes" icon={<BsFileText />} label="Minhas redações" />
+          <NavItem href="/redacao" icon={<RiStickyNoteAddLine />} label="Nova redação" />
           <NavItem href="/ebooks" icon={<PiBooksLight />} label="Meus Ebooks" />
           <NavItem href="/comprar" icon={<MdAttachMoney />} label="Comprar créditos" />
         </nav>

@@ -16,9 +16,8 @@ export default async function Redacao() {
     const user = data.user!
 
     return (
-        <div>
-            <HeaderDashboard />
-            <div className='flex m-auto w-3/5 items-center h-screen w-2/4 p-6 overflow-y-auto'>
+        <div>            
+            <div className='flex m-auto items-center h-screen p-6 overflow-y-auto'>
                 <RedacaoForm email={user.email ?? ''} />
             </div>
         </div>

@@ -10,50 +10,7 @@ import capaFilosofia from '../../../public/images/capa-filosofia.webp'
 export default function Ebooks() {
     return (
         <div>
-            <HeaderDashboard />
-            <div className='flex flex-col w-4/5 m-auto py-10'>
-                <div className='flex justify-center gap-5'>
-                    <Link href="ebooks/as-4-matrizes-de-conhecimento-enem">
-                        <Image 
-                            src={capa4matrizes}
-                            alt='As 4 Matrizes do Enem'
-                            width={200}
-                        />
-                    </Link>
-
-                    <Link href="ebooks/como-escrever-uma-redacao-de-sucesso">
-                        <Image 
-                            src={capaRedacaoSucesso}
-                            alt='Redação de Sucesso'
-                            width={200}
-                        />
-                    </Link>
-
-                    <Link href="ebooks/ciencias-humanas">
-                        <Image 
-                            src={capaCienciasHumanas}
-                            alt='Ciências Humanas'
-                            width={200}
-                        />
-                    </Link>
-
-                    <Link href="ebooks/lingua-portuguesa">
-                        <Image 
-                            src={capaLinguaPortuguesa}
-                            alt='Línguas Portuguesa'
-                            width={200}
-                        />
-                    </Link>
-
-                    <Link href="ebooks/filosofia">
-                        <Image 
-                            src={capaFilosofia}
-                            alt='Filosofia'
-                            width={200}
-                        />
-                    </Link>
-                </div>
-            </div>
+           Em Breve
         </div>
     )
 }

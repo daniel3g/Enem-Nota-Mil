@@ -87,7 +87,7 @@ export default async function DashboardPage() {
 
           {/* lista + créditos */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm">Você possui</span>
                 <span className="inline-flex items-center text-sm font-semibold px-1 py-1 rounded-lg bg-customGreen/10 text-customGreen border border-customGreen/30">
@@ -100,6 +100,13 @@ export default async function DashboardPage() {
                 className="px-4 py-2 rounded bg-slate-600 hover:bg-slate-700 text-white font-medium"
               >
                 Comprar créditos
+              </a>
+
+              <a
+                href="/redacao"
+                className="px-4 py-2 rounded bg-customGreen hover:bg-green-700 text-white font-medium"
+              >
+                Iniciar redação
               </a>
             </div>
 

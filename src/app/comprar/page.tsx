@@ -76,8 +76,8 @@ export default function Comprar() {
           <button onClick={() => buy("p1")} className="px-4 py-2 border-2 border-customPurple rounded mt-8 text-customPurple">COMPRE AGORA</button>
         </div>
         <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
-          <strong className="font-heading text-xl font-extrabold">QUERO EXPERIMENTAR</strong>
-          <p>1 CRÉDITO</p>
+          <strong className="font-heading text-xl font-extrabold">QUERO MELHORAR</strong>
+          <p>5 CRÉDITOS</p>
           <p className="text-customPurple">Utilize quando quiser</p>
           <hr />
           <s className="mt-5">de R$ 49,90</s>
@@ -86,8 +86,8 @@ export default function Comprar() {
           <button onClick={() => buy("p5")} className="px-4 py-2 border-2 border-customPurple rounded mt-8 text-customPurple">COMPRE AGORA</button>
         </div>
         <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
-          <strong className="font-heading text-xl font-extrabold">QUERO EXPERIMENTAR</strong>
-          <p>1 CRÉDITO</p>
+          <strong className="font-heading text-xl font-extrabold">QUERO ARRASAR</strong>
+          <p>10 CRÉDITOS</p>
           <p className="text-customPurple">Utilize quando quiser</p>
           <hr />
           <s className="mt-5">de R$ 99,90</s>
