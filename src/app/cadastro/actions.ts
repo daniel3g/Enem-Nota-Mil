@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { createClient } from '../../../utils/supabase/server'
 
 export async function signup(formData: FormData): Promise<{ error: Error | null }> {
@@ -16,7 +15,8 @@ export async function signup(formData: FormData): Promise<{ error: Error | null 
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/email-confirm`,
-    }
+      data: { full_name, phone }, // <- grava nos metadados do usuário
+    },
   })
 
   if (error || !data?.user?.id) {
@@ -25,14 +25,8 @@ export async function signup(formData: FormData): Promise<{ error: Error | null 
 
   await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/create-profile`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      id: data.user.id,
-      full_name,
-      phone,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: data.user.id, full_name, phone }),
   })
 
   return { error: null }

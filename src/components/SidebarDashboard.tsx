@@ -7,7 +7,8 @@ import { RxHome } from "react-icons/rx"
 import { BsFileText } from "react-icons/bs"
 import { PiBooksLight } from "react-icons/pi"
 import { MdAttachMoney } from "react-icons/md"
-import { RiStickyNoteAddLine } from "react-icons/ri";
+import { RiStickyNoteAddLine } from "react-icons/ri"
+import { CgProfile } from "react-icons/cg"
 import { signOut } from '@/app/login/actions'
 import Logo from '../../public/images/logo.webp'
 import AvatarDefault from '../../public/images/avatar.png'
@@ -54,6 +55,7 @@ export default async function SidebarDashboard({
           <NavItem href="/redacao" icon={<RiStickyNoteAddLine />} label="Nova redação" />
           <NavItem href="/ebooks" icon={<PiBooksLight />} label="Meus Ebooks" />
           <NavItem href="/comprar" icon={<MdAttachMoney />} label="Comprar créditos" />
+          <NavItem href="/perfil" icon={<CgProfile />} label="Atualizar perfil" />
         </nav>
 
         <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
