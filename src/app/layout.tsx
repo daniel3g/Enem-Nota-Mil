@@ -1,34 +1,31 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import './globals.css'
+import { Open_Sans, Raleway } from 'next/font/google'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-heading',
+  display: 'swap',
+})
 
-export const metadata: Metadata = {
-  title: "ENEM Nota Mil",
-  description: "Aqui a aprovação é garantida",
-};
+export const metadata = {
+  title: 'Seu App',
+  description: 'Descrição...',
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${openSans.variable} ${raleway.variable} font-sans`}>
         {children}
       </body>
     </html>
-  );
+  )
 }

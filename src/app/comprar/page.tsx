@@ -60,39 +60,40 @@ export default function Comprar() {
   }
 
   return (
-    <div className="flex flex-col w-full mx-8 my-3 bg-white border-t-4 rounded-lg border-customGreen p-6 space-y-4">
-      <strong className="text-xl">PREÇOS</strong>
-      <h2 className="text-3xl">PACOTES E PLANOS</h2>
+    <div className="flex flex-col w-full m-8 my-3 bg-white border-t-4 rounded-lg border-customGreen p-6 space-y-4">
+      <strong className="text-xl text-customGreen">PREÇOS</strong>
+      <h2 className="text-3xl font-heading font-extrabold">PACOTES E PLANOS</h2>
+      <hr />
       <div className="flex w-full gap-6">
-        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
-          <strong>QUERO EXPERIMENTAR</strong>
+        <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
+          <strong className="font-heading text-xl font-extrabold">QUERO EXPERIMENTAR</strong>
           <p>1 CRÉDITO</p>
-          <p>Utilize quando quiser</p>
+          <p className="text-customPurple">Utilize quando quiser</p>
           <hr />
-          <strong>de R$ 25,90</strong>
-          <strong>por R$ 19,70</strong>
+          <s className="mt-5">de R$ 14,90</s>
+          <strong className="text-2xl text-customPurple">por R$ 9,90</strong>
           <p>1 correção detalhada</p>
-          <button onClick={() => buy("p1")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+          <button onClick={() => buy("p1")} className="px-4 py-2 border-2 border-customPurple rounded mt-8 text-customPurple">COMPRE AGORA</button>
         </div>
-        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
-          <strong>QUERO EXPERIMENTAR</strong>
+        <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
+          <strong className="font-heading text-xl font-extrabold">QUERO EXPERIMENTAR</strong>
           <p>1 CRÉDITO</p>
-          <p>Utilize quando quiser</p>
+          <p className="text-customPurple">Utilize quando quiser</p>
           <hr />
-          <strong>de R$ 25,90</strong>
-          <strong>por R$ 19,70</strong>
-          <p>1 correção detalhada</p>
-          <button onClick={() => buy("p5")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+          <s className="mt-5">de R$ 49,90</s>
+          <strong className="text-2xl text-customPurple">por R$ 39,90</strong>
+          <p>5 correções detalhadas</p>
+          <button onClick={() => buy("p5")} className="px-4 py-2 border-2 border-customPurple rounded mt-8 text-customPurple">COMPRE AGORA</button>
         </div>
-        <div className="flex flex-col p-5 w-1/3 border border-customBlackLight rounded-lg gap-2">
-          <strong>QUERO EXPERIMENTAR</strong>
+        <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
+          <strong className="font-heading text-xl font-extrabold">QUERO EXPERIMENTAR</strong>
           <p>1 CRÉDITO</p>
-          <p>Utilize quando quiser</p>
+          <p className="text-customPurple">Utilize quando quiser</p>
           <hr />
-          <strong>de R$ 25,90</strong>
-          <strong>por R$ 19,70</strong>
-          <p>1 correção detalhada</p>
-          <button onClick={() => buy("p10")} className="px-4 py-2 rounded bg-black text-white">COMPRE AGORA</button>
+          <s className="mt-5">de R$ 99,90</s>
+          <strong className="text-2xl text-customPurple">por R$ 69,90</strong>
+          <p>10 correções detalhadas</p>
+          <button onClick={() => buy("p10")} className="px-4 py-2 border-2 border-customPurple rounded mt-8 text-customPurple">COMPRE AGORA</button>
         </div>
       </div>
       
