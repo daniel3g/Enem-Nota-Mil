@@ -21,13 +21,15 @@ export async function GET() {
   // 2) Busca o perfil (pode não existir ainda)
   const { data: profile, error: profErr } = await supabase
     .from("profiles")
-    .select("full_name, phone, cpf_cnpj")
+    .select("full_name, phone, cpf_cnpj, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
 
   if (profErr && profErr.code !== "PGRST116") {
     return new Response(JSON.stringify({ error: profErr.message }), { status: 500 });
   }
+
+  
 
   // 3) Preenche com metadados do Auth se o perfil ainda não tiver valores
   const meta = user.user_metadata ?? {};
@@ -41,6 +43,7 @@ export async function GET() {
       full_name,
       phone,
       cpf_cnpj,
+      avatar_url: profile?.avatar_url ?? null,
     }),
     { status: 200 }
   );

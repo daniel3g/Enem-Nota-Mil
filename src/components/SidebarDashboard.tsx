@@ -14,17 +14,17 @@ import Logo from '../../public/images/logo.webp'
 import AvatarDefault from '../../public/images/avatar.png'
 import ClientBalanceBadge from "@/components/ClientBalanceBadge"
 
-export default async function SidebarDashboard({
-  children,
-}: { children: React.ReactNode }) {
+export default async function SidebarDashboard({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) redirect('/login')
 
   const user = data.user!
+
+  // 🔽 agora também buscamos avatar_url
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name')
+    .select('full_name, avatar_url')
     .eq('id', user.id)
     .single()
 
@@ -38,10 +38,10 @@ export default async function SidebarDashboard({
   }
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Usuário'
+  const avatarUrl = profile?.avatar_url || null
 
   return (
     <div className="min-h-dvh bg-gray-100 text-gray-800">
-      {/* SIDEBAR */}
       <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white shadow-xl">
         <div className="flex items-center p-3 px-5 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center gap-3">
@@ -60,7 +60,19 @@ export default async function SidebarDashboard({
 
         <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
           <div className="flex items-center gap-3">
-            <Image src={AvatarDefault} alt="Foto de perfil" width={36} height={36} className="rounded-full" />
+            {/* se houver avatar_url (string remota), usa; senão, fallback local */}
+            {avatarUrl ? (
+              <Image src={avatarUrl} alt="Avatar" width={96} height={96} unoptimized className="rounded-full" />
+
+            ) : (
+              <Image
+                src={AvatarDefault}
+                alt="Foto de perfil"
+                width={36}
+                height={36}
+                className="rounded-full"
+              />
+            )}
             <div className="text-sm leading-5">
               <div className="opacity-70">Bem-vindo,</div>
               <div className="font-medium">{firstName}</div>
@@ -70,17 +82,13 @@ export default async function SidebarDashboard({
           <ClientBalanceBadge initial={initial} /> Créditos
 
           <form>
-            <button
-              className="w-full bg-customPurple rounded-md py-2 text-sm font-medium"
-              formAction={signOut}
-            >
+            <button className="w-full bg-customPurple rounded-md py-2 text-sm font-medium" formAction={signOut}>
               Sair
             </button>
           </form>
         </div>
       </aside>
 
-      {/* MAIN */}
       <main className="lg:pl-64 p-4 lg:p-8">{children}</main>
     </div>
   )
@@ -88,10 +96,7 @@ export default async function SidebarDashboard({
 
 function NavItem({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
   return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition"
-    >
+    <Link href={href} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
       <span className="text-lg">{icon}</span>
       <span className="font-medium">{label}</span>
     </Link>
