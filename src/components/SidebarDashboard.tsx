@@ -1,44 +1,54 @@
 // components/SidebarDashboard.tsx
-import { redirect } from 'next/navigation'
-import { createClient } from '../../utils/supabase/server'
-import Link from 'next/link'
-import Image from 'next/image'
-import { RxHome } from "react-icons/rx"
-import { BsFileText } from "react-icons/bs"
-import { PiBooksLight } from "react-icons/pi"
-import { MdAttachMoney } from "react-icons/md"
-import { RiStickyNoteAddLine } from "react-icons/ri"
-import { CgProfile } from "react-icons/cg"
-import { signOut } from '@/app/login/actions'
-import Logo from '../../public/images/logo.webp'
-import AvatarDefault from '../../public/images/avatar.png'
-import ClientBalanceBadge from "@/components/ClientBalanceBadge"
+import { redirect } from "next/navigation";
+import { createClient } from "../../utils/supabase/server";
+import Link from "next/link";
+import Image from "next/image";
+import { RxHome } from "react-icons/rx";
+import { BsFileText } from "react-icons/bs";
+import { PiBooksLight } from "react-icons/pi";
+import { MdAttachMoney } from "react-icons/md";
+import { RiStickyNoteAddLine } from "react-icons/ri";
+import { CgProfile } from "react-icons/cg";
+import { signOut } from "@/app/login/actions";
+import Logo from "../../public/images/logo.webp";
+import AvatarDefault from "../../public/images/avatar.png";
+import ClientBalanceBadge from "@/components/ClientBalanceBadge";
 
-export default async function SidebarDashboard({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) redirect('/login')
+export default async function SidebarDashboard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getUser();
 
-  const user = data.user!
+  if (error || !data?.user) redirect("/login");
 
-  // 🔽 agora também buscamos avatar_url
+  const user = data.user!;
+
+  // 🔽 busca nome e avatar do perfil
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, avatar_url')
-    .eq('id', user.id)
-    .single()
+    .from("profiles")
+    .select("full_name, avatar_url")
+    .eq("id", user.id)
+    .single();
 
-  let initial = 0
+  // 🔽 saldo inicial de créditos vindo da view user_credit_balance
+  let initial = 0;
   {
-    const { data } = await supabase
-      .from("credit_transactions")
-      .select("amount")
+    const { data: balanceRow, error: balanceError } = await supabase
+      .from("user_credit_balance")
+      .select("balance")
       .eq("user_id", user.id)
-    initial = (data ?? []).reduce((a, r: any) => a + (r.amount ?? 0), 0)
+      .maybeSingle();
+
+    if (!balanceError && balanceRow?.balance != null) {
+      initial = balanceRow.balance;
+    }
   }
 
-  const firstName = profile?.full_name?.split(' ')[0] ?? 'Usuário'
-  const avatarUrl = profile?.avatar_url || null
+  const firstName = profile?.full_name?.split(" ")[0] ?? "Usuário";
+  const avatarUrl = profile?.avatar_url || null;
 
   return (
     <div className="min-h-dvh bg-gray-100 text-gray-800">
@@ -60,10 +70,15 @@ export default async function SidebarDashboard({ children }: { children: React.R
 
         <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
           <div className="flex items-center gap-3">
-            {/* se houver avatar_url (string remota), usa; senão, fallback local */}
             {avatarUrl ? (
-              <Image src={avatarUrl} alt="Avatar" width={96} height={96} unoptimized className="rounded-full" />
-
+              <Image
+                src={avatarUrl}
+                alt="Avatar"
+                width={96}
+                height={96}
+                unoptimized
+                className="rounded-full"
+              />
             ) : (
               <Image
                 src={AvatarDefault}
@@ -73,16 +88,23 @@ export default async function SidebarDashboard({ children }: { children: React.R
                 className="rounded-full"
               />
             )}
+
             <div className="text-sm leading-5">
               <div className="opacity-70">Bem-vindo,</div>
               <div className="font-medium">{firstName}</div>
             </div>
           </div>
 
-          <ClientBalanceBadge initial={initial} /> Créditos
+          <div className="flex items-center gap-2">
+            <ClientBalanceBadge initial={initial} />
+            <span className="text-sm">Créditos</span>
+          </div>
 
           <form>
-            <button className="w-full bg-customPurple rounded-md py-2 text-sm font-medium" formAction={signOut}>
+            <button
+              className="w-full bg-customPurple rounded-md py-2 text-sm font-medium"
+              formAction={signOut}
+            >
               Sair
             </button>
           </form>
@@ -91,14 +113,25 @@ export default async function SidebarDashboard({ children }: { children: React.R
 
       <main className="lg:pl-64 p-4 lg:p-8">{children}</main>
     </div>
-  )
+  );
 }
 
-function NavItem({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function NavItem({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
   return (
-    <Link href={href} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition">
+    <Link
+      href={href}
+      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition"
+    >
       <span className="text-lg">{icon}</span>
       <span className="font-medium">{label}</span>
     </Link>
-  )
+  );
 }

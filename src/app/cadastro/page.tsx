@@ -11,18 +11,20 @@ import Image from "next/image";
 import logo from '../../../public/images/logo.webp';
 import ImageStudent from '../../../public/images/bg-login.webp'
 
-
 export default function LoginPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setIsLoading(true)
+    setError(null)
 
     const form = event.target as HTMLFormElement
     const formData = new FormData(form)
@@ -30,23 +32,29 @@ export default function LoginPage() {
     const senha = formData.get('password') as string
     const senhaConfirmacao = formData.get('confirmPassword') as string
 
-    const senhaForteRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/
+    const senhaForteRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/
 
     if (!senhaForteRegex.test(senha)) {
-      setError('A senha deve conter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial (_@$!%*?&).')
+      setError(
+        'A senha deve conter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial (_@$!%*?&).'
+      )
+      setIsLoading(false)
       return
     }
 
     if (senha !== senhaConfirmacao) {
       setError('As senhas não coincidem.')
+      setIsLoading(false)
       return
     }
 
     try {
       const result = await signup(formData)
 
-      if (result.error) {
+      if (result?.error) {
         setError(result.error.message || 'Erro ao cadastrar.')
+        setIsLoading(false)
         return
       }
 
@@ -54,6 +62,7 @@ export default function LoginPage() {
     } catch (err) {
       console.error('Erro ao cadastrar:', err)
       setError('Erro interno no cadastro.')
+      setIsLoading(false)
     }
   }
 
@@ -70,6 +79,7 @@ export default function LoginPage() {
           />
         </div>
       </div>
+
       <div className='flex flex-col w-full justify-center items-center sm:w-1/3'>
         <a href='/'>
           <Image
@@ -78,12 +88,20 @@ export default function LoginPage() {
             height={60}
           />
         </a>
+
         <form className='flex flex-col w-full p-3 sm:w-96' onSubmit={handleSubmit}>
           <h2 className='mb-8 text-lg'>Cadastre-se agora</h2>
 
           <label htmlFor='nome' className='text-gray-500 text-sm'>Nome Completo:</label>
-          <input className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu nome completo' id='nome' name='nome' type='text' required />
-          
+          <input
+            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            placeholder='Seu nome completo'
+            id='nome'
+            name='nome'
+            type='text'
+            required
+          />
+
           <label htmlFor='phone' className='text-gray-500 text-sm'>Celular:</label>
           <input
             className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
@@ -95,7 +113,14 @@ export default function LoginPage() {
           />
 
           <label htmlFor='email' className='text-gray-500 text-sm'>Email:</label>
-          <input className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm' placeholder='Seu e-mail' id='email' name='email' type='email' required />
+          <input
+            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            placeholder='Seu e-mail'
+            id='email'
+            name='email'
+            type='email'
+            required
+          />
 
           <label htmlFor='password' className='text-gray-500 text-sm'>Senha:</label>
           <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
@@ -107,8 +132,12 @@ export default function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               required
             />
-            <button type='button' onClick={togglePasswordVisibility} className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'>
-            {showPassword ? <LuEyeClosed /> : <LuEye />}
+            <button
+              type='button'
+              onClick={togglePasswordVisibility}
+              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
+            >
+              {showPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
@@ -122,16 +151,33 @@ export default function LoginPage() {
               type={showConfirmPassword ? 'text' : 'password'}
               required
             />
-            <button type='button' onClick={toggleConfirmPasswordVisibility} className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'>
-            {showConfirmPassword ? <LuEyeClosed /> : <LuEye />}
+            <button
+              type='button'
+              onClick={toggleConfirmPasswordVisibility}
+              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
+            >
+              {showConfirmPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
-          {error && <p className='text-red-500 text-sm'>{error}</p>}
+          {error && (
+            <p className='text-red-500 text-sm mb-3'>
+              {error}
+            </p>
+          )}
 
-          <p className='text-gray-500 text-xs mb-5'>Ao se cadastrar, você aceita nossos termos de uso e a nossa política de privacidade.</p>
+          <p className='text-gray-500 text-xs mb-5'>
+            Ao se cadastrar, você aceita nossos termos de uso e a nossa política de privacidade.
+          </p>
 
-          <button type='submit' className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white'>Cadastrar</button>
+          <button
+            type='submit'
+            disabled={isLoading}
+            className={`bg-customPurple p-4 rounded-sm mt-2 text-xl text-white w-full
+              ${isLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+          >
+            {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+          </button>
 
           <a href='/login'>
             <div className='flex bg-gray-200 flex-col sm:w-full p-4 mt-5 rounded-md'>

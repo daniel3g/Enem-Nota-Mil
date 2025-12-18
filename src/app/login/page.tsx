@@ -2,12 +2,30 @@
 
 import { login } from './actions'
 import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 
 import Image from "next/image";
 import logo from '../../../public/images/logo.webp';
 import ImageStudent from '../../../public/images/bg-login.webp'
 
 import { LuEye, LuEyeClosed } from 'react-icons/lu'
+  
+
+// 🔹 Botão que "escuta" o estado do form
+function SubmitButton() {
+  const { pending } = useFormStatus()
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className={`bg-customPurple p-4 rounded-sm mt-2 text-xl text-white w-full
+        ${pending ? 'opacity-60 cursor-not-allowed' : ''}`}
+    >
+      {pending ? 'Entrando...' : 'Entrar'}
+    </button>
+  )
+}
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -35,7 +53,7 @@ export default function LoginPage() {
           />
         </a>
       
-        <form className='flex flex-col w-full p-3 sm:w-96'>
+        <form className='flex flex-col w-full p-3 sm:w-96' action={login}>
           <h2 className='mb-8 text-lg'>Acesse sua conta</h2>
 
           <label className='text-gray-500 text-sm' htmlFor="email">Email:</label>
@@ -65,7 +83,8 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <button className='bg-customPurple p-4 rounded-sm mt-2 text-xl text-white' formAction={login}>Entrar</button>
+          {/* 🔹 Aqui o botão que usa useFormStatus */}
+          <SubmitButton />
 
           <a href="/cadastro">
             <div className='flex flex-col bg-gray-200 sm:w-full p-4 mt-5 rounded-md'>

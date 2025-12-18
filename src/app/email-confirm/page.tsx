@@ -9,7 +9,7 @@ export default function EmailConfirm() {
       <div className="w-full sm:w-1/2 text-center sm:text-left">
         <h1 className="text-2xl font-semibold">Obrigado pelo seu registro!</h1>
         <p className="text-base">
-          Por favor, clique no botão abaixo para acessar a página de login.
+          Por favor, acesse seu email para confirmar o cadastro. Caso o email não esteja na caixa de entrada, verifique na caixa de spam!
         </p>
         <Link href="/login">
           <button className="bg-customPurple mt-5 py-3 px-8 sm:px-12 rounded-md text-white text-lg">

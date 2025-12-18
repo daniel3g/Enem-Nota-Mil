@@ -13,14 +13,18 @@ export default async function DashboardPage() {
       .eq('id', user.id)
       .single()
   
-    let initial = 0
-    {
-      const { data } = await supabase
-        .from("credit_transactions")
-        .select("amount")
-        .eq("user_id", user.id)
-      initial = (data ?? []).reduce((a, r: any) => a + (r.amount ?? 0), 0)
+    let initial = 0;
+  {
+    const { data: balanceRow, error: balanceError } = await supabase
+      .from("user_credit_balance")
+      .select("balance")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!balanceError && balanceRow?.balance != null) {
+      initial = balanceRow.balance;
     }
+  }
 
   return (
     <div className="space-y-8">
