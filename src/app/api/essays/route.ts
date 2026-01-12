@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "../../../../utils/supabase/server";
 
-const WEBHOOK_URL = "https://workflows.guarumidia.com/webhook-test/647c8eda-c8f3-4e60-a0f7-fb9444c8d604";
+const WEBHOOK_URL = "https://webhooks.guarumidia.com/webhook/647c8eda-c8f3-4e60-a0f7-fb9444c8d604";
 
 export async function POST(req: Request) {
   const supabase = await createClient();
