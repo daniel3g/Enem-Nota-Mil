@@ -1,87 +1,89 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-interface RedacaoFormProps {
-  email: string; // não é mais necessário, mas mantive compatível
-}
+export default function RedacaoForm({ email }: { email: string }) {
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const RedacaoForm = ({ email }: RedacaoFormProps) => {
-  const [redaction, setRedaction] = useState('');
-  const [responseMessage, setResponseMessage] = useState('');
-  const [busy, setBusy] = useState(false);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setResponseMessage('');
-    if (!redaction.trim()) {
-      setResponseMessage('Digite o conteúdo da redação.');
+    if (!content.trim()) {
+      setError("Digite sua redação antes de enviar.");
       return;
     }
 
-    setBusy(true);
+    setError(null);
+    setLoading(true);
+
     try {
-      // Agora chamamos a sua API interna: debita 1 crédito + cria 'queued' + envia ao n8n
-      const res = await fetch('/api/essays', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const res = await fetch("/api/essays", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: null,
-          content: redaction,
+          content,
+          email,
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setResponseMessage(data?.error || 'Erro ao enviar redação.');
-      } else {
-        setResponseMessage('Redação enviada com sucesso!');
-        setRedaction('');
-
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('credits:changed'));
-        }
+        throw new Error("Erro ao enviar redação.");
       }
-    } catch {
-      setResponseMessage('Erro ao enviar redação. Por favor, tente novamente.');
+
+      // limpa o campo após sucesso
+      setContent("");
+      alert("Redação enviada com sucesso!");
+    } catch (err) {
+      setError("Não foi possível enviar sua redação. Tente novamente.");
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="w-full p-6 bg-white rounded-md shadow-lg">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">Escreva sua Redação</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <textarea
-            name="redaction"
-            id="redaction"
-            value={redaction}
-            onChange={(e) => setRedaction(e.target.value)}
-            required
-            rows={20}
-            placeholder="Digite aqui sua redação..."
-            className="w-full resize-none p-4 text-gray-800 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          disabled={busy || !redaction.trim()}
-          className="w-full py-2 px-4 bg-customPurple text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {busy ? 'Enviando…' : 'Enviar Redação (–1 crédito)'}
-        </button>
-      </form>
-      {responseMessage && (
-        <p className={`mt-4 text-center ${responseMessage.includes('sucesso') ? 'text-green-600' : 'text-red-600'}`}>
-          {responseMessage}
-        </p>
-      )}
-    </div>
-  );
-};
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Textarea */}
+      <div>
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Digite aqui sua redação..."
+          rows={14}
+          className="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 text-sm text-slate-800 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+          disabled={loading}
+        />
+      </div>
 
-export default RedacaoForm;
+      {/* Erro */}
+      {error && (
+        <div className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-700 border border-red-200">
+          {error}
+        </div>
+      )}
+
+      {/* Botão */}
+      <button
+        type="submit"
+        disabled={loading}
+        className={`
+          flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 
+          text-sm font-bold text-white transition
+          ${loading
+            ? "bg-slate-400 cursor-not-allowed"
+            : "bg-emerald-600 hover:bg-emerald-700"}
+        `}
+      >
+        {loading ? (
+          <>
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            Enviando redação…
+          </>
+        ) : (
+          "Enviar redação"
+        )}
+      </button>
+    </form>
+  );
+}

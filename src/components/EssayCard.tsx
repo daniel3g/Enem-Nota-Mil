@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Correction = {
   id: string;
   model: string | null;
-  score: number | null; // 0–100 ou escala que você usar
-  feedback: any;        // JSON (ex.: rubrica, observações, etc.)
+  score: number | null;
+  feedback: any;
   created_at: string;
 };
 
@@ -14,164 +14,200 @@ type Essay = {
   id: string;
   title: string | null;
   content: string | null;
-  status: "draft" | "queued" | "processing" | "done" | "failed";
+  status: "draft" | "queued" | "processing" | "done" | "failed" | string;
   created_at: string;
   essay_corrections?: Correction[];
 };
 
-export default function EssayCard({ essay }: { essay: Essay }) {
-  const [open, setOpen] = useState(false);
-
-  const created = new Date(essay.created_at);
-  const dateStr = created.toLocaleString("pt-BR", {
+function formatDateBR(dateIso: string) {
+  const d = new Date(dateIso);
+  return d.toLocaleString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-
-  const statusColor =
-    essay.status === "done" ? "bg-green-100 text-green-800 border-green-300"
-    : essay.status === "processing" ? "bg-yellow-100 text-yellow-800 border-yellow-300"
-    : essay.status === "queued" ? "bg-blue-100 text-blue-800 border-blue-300"
-    : essay.status === "failed" ? "bg-red-100 text-red-800 border-red-300"
-    : "bg-gray-100 text-gray-800 border-gray-300";
-
-  const corrections = (essay.essay_corrections || []).sort((a, b) =>
-    a.created_at < b.created_at ? 1 : -1
-  );
-
-  const latestScore =
-    corrections.length > 0 && corrections[0].score != null
-      ? corrections[0].score
-      : null;
-
-  return (
-    <div className="border rounded-md p-4">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-lg font-semibold">
-            {essay.title || "Redação sem título"}
-          </h2>
-          <p className="text-sm text-gray-600">Enviada em {dateStr}</p>
-          <div className="flex items-center gap-2">
-            <span className={`text-xs border px-2 py-0.5 rounded ${statusColor}`}>
-              Status: {labelStatus(essay.status)}
-            </span>
-            {latestScore != null && (
-              <span className="text-xs border px-2 py-0.5 rounded bg-emerald-50 border-emerald-200 text-emerald-800">
-                Nota mais recente: <b>{formatScore(latestScore)}</b>
-              </span>
-            )}
-          </div>
-        </div>
-
-        <button
-          onClick={() => setOpen(!open)}
-          className="self-start md:self-auto border px-3 py-1.5 rounded hover:bg-gray-50"
-        >
-          {open ? "Ocultar detalhes" : "Ver detalhes"}
-        </button>
-      </div>
-
-      {open && (
-        <div className="mt-4 space-y-4">
-          {/* Conteúdo original (colapsável) */}
-          {essay.content && (
-            <div>
-              <h3 className="text-sm font-medium mb-2">Texto enviado</h3>
-              <div className="bg-gray-50 border rounded p-3 whitespace-pre-wrap text-sm">
-                {essay.content}
-              </div>
-            </div>
-          )}
-
-          {/* Correções */}
-          <div>
-            <h3 className="text-sm font-medium mb-2">
-              Correções ({corrections.length})
-            </h3>
-
-            {corrections.length === 0 ? (
-              <p className="text-sm text-gray-600">
-                Ainda não há correções para esta redação.
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {corrections.map((c) => (
-                  <li key={c.id} className="border rounded p-3">
-                    <div className="flex flex-wrap items-center gap-2 justify-between">
-                      <span className="text-sm text-gray-700">
-                        {new Date(c.created_at).toLocaleString("pt-BR")}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {c.model && (
-                          <span className="text-xs border px-2 py-0.5 rounded bg-gray-50">
-                            Modelo: {c.model}
-                          </span>
-                        )}
-                        {c.score != null && (
-                          <span className="text-xs border px-2 py-0.5 rounded bg-emerald-50 border-emerald-200 text-emerald-800">
-                            Nota: <b>{formatScore(c.score)}</b>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Feedback em JSON (renderização simples) */}
-                    {c.feedback && (
-                      <div className="mt-2 text-sm">
-                        <FeedbackBlock feedback={c.feedback} />
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 function labelStatus(s: Essay["status"]) {
-  switch (s) {
-    case "done": return "Concluída";
-    case "processing": return "Processando";
-    case "queued": return "Na fila";
-    case "failed": return "Falhou";
-    case "draft": return "Rascunho";
-    default: return s;
-  }
+  const v = String(s).toLowerCase();
+  if (v === "done" || v === "corrected" || v === "corrigida") return "Corrigida";
+  if (v === "processing") return "Processando";
+  if (v === "queued" || v === "na_fila") return "Na fila";
+  if (v === "failed" || v === "falhou") return "Falhou";
+  if (v === "draft") return "Rascunho";
+  return String(s);
+}
+
+function pillClassByStatus(status: string) {
+  const v = status.toLowerCase();
+  if (v.includes("done") || v.includes("correct")) return "bg-emerald-100 text-emerald-700";
+  if (v.includes("processing")) return "bg-amber-100 text-amber-700";
+  if (v.includes("queued") || v.includes("fila")) return "bg-slate-200 text-slate-700";
+  if (v.includes("failed") || v.includes("falh")) return "bg-red-100 text-red-700";
+  return "bg-slate-200 text-slate-700";
 }
 
 function formatScore(score: number) {
-  // ajuste se sua escala for 0–1000 etc.
   return Number.isFinite(score) ? String(score) : "-";
 }
 
+export default function EssayCard({ essay }: { essay: Essay }) {
+  const [open, setOpen] = useState(false);
+
+  const correctionsSorted = useMemo(() => {
+    return [...(essay.essay_corrections || [])].sort((a, b) =>
+      a.created_at < b.created_at ? 1 : -1
+    );
+  }, [essay.essay_corrections]);
+
+  const latestScore =
+    correctionsSorted.length > 0 && correctionsSorted[0].score != null
+      ? correctionsSorted[0].score
+      : null;
+
+  // ✅ Status real: se tem correção, é "done" (corrigida), mesmo que o banco esteja com queued
+  const derivedStatus =
+    correctionsSorted.length > 0 ? "done" : (essay.status ?? "queued");
+
+  return (
+    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+      {/* Capa */}
+      <div className="relative h-28 bg-gradient-to-br from-slate-100 to-slate-200">
+        <div className="absolute left-4 top-4">
+          <span className="inline-flex rounded-md bg-emerald-600 px-3 py-1 text-xs font-extrabold text-white">
+            Dissertação ENEM
+          </span>
+        </div>
+
+        {latestScore != null && (
+          <div className="absolute right-4 top-4">
+            <span className="inline-flex rounded-md bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-700">
+              NOTA: {formatScore(latestScore)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-sm font-extrabold uppercase tracking-wide text-slate-800 line-clamp-2">
+              {essay.title || "Redação sem título"}
+            </h3>
+            <p className="mt-1 text-xs text-slate-500">
+              Enviada em: {formatDateBR(essay.created_at)}
+            </p>
+          </div>
+
+          <span
+            className={[
+              "inline-flex rounded-md px-2 py-1 text-xs font-extrabold",
+              pillClassByStatus(String(derivedStatus)),
+            ].join(" ")}
+          >
+            {labelStatus(derivedStatus)}
+          </span>
+        </div>
+
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-lime-600 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-lime-700"
+          type="button"
+        >
+          {open ? "OCULTAR DETALHES" : "VEJA A CORREÇÃO"}
+        </button>
+
+        {open && (
+          <div className="mt-5 space-y-5">
+            {/* Texto enviado */}
+            {essay.content && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-2 text-xs font-extrabold tracking-wide text-slate-700">
+                  TEXTO ENVIADO
+                </div>
+                <div className="whitespace-pre-wrap text-sm text-slate-700">
+                  {essay.content}
+                </div>
+              </div>
+            )}
+
+            {/* Correções */}
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="text-xs font-extrabold tracking-wide text-slate-700">
+                  CORREÇÕES ({correctionsSorted.length})
+                </div>
+              </div>
+
+              {correctionsSorted.length === 0 ? (
+                <p className="text-sm text-slate-600">
+                  Ainda não há correções para esta redação.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {correctionsSorted.map((c) => (
+                    <li
+                      key={c.id}
+                      className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-slate-600">
+                          {formatDateBR(c.created_at)}
+                        </span>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          {c.model && (
+                            <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                              Modelo: {c.model}
+                            </span>
+                          )}
+                          {c.score != null && (
+                            <span className="rounded-md bg-emerald-100 px-2 py-1 text-xs font-extrabold text-emerald-700">
+                              Nota: {formatScore(c.score)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {c.feedback && (
+                        <div className="mt-3">
+                          <FeedbackBlock feedback={c.feedback} />
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function FeedbackBlock({ feedback }: { feedback: any }) {
-  // Se o n8n salvar feedback estruturado (ex.: {competencias: {...}, observacoes: "..."}):
-  // Renderiza de forma amigável; fallback para JSON bonito.
   try {
     if (typeof feedback === "object" && feedback !== null) {
-      // Renderização simples: chaves/valores
       return (
-        <div className="bg-gray-50 border rounded p-3">
-          <pre className="whitespace-pre-wrap">
+        <div className="rounded-lg border border-slate-200 bg-white p-3">
+          <pre className="whitespace-pre-wrap text-xs text-slate-700">
             {JSON.stringify(feedback, null, 2)}
           </pre>
         </div>
       );
     }
-    // Se vier string, mostra direto:
-    return <p className="bg-gray-50 border rounded p-3">{String(feedback)}</p>;
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700">
+        {String(feedback)}
+      </div>
+    );
   } catch {
     return (
-      <div className="bg-gray-50 border rounded p-3">
-        <pre className="whitespace-pre-wrap">
+      <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <pre className="whitespace-pre-wrap text-xs text-slate-700">
           {JSON.stringify(feedback, null, 2)}
         </pre>
       </div>
