@@ -147,11 +147,14 @@ function CriteriaDistributionTable({
   );
 }
 
-export default async function EssayDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// ✅ Next 15: params precisa ser awaited
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function EssayDetailPage({ params }: PageProps) {
+  const { id } = await params;
+
   const supabase = await createClient();
 
   const { data: auth } = await supabase.auth.getUser();
@@ -163,7 +166,7 @@ export default async function EssayDetailPage({
   const { data: essay, error: essayErr } = await supabase
     .from("essays")
     .select("id,title,content,status,created_at,user_id")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", userId)
     .single();
 
@@ -182,7 +185,7 @@ export default async function EssayDetailPage({
   const { data: corrections } = await supabase
     .from("essay_corrections")
     .select("id,model,score,feedback,created_at")
-    .eq("essay_id", params.id)
+    .eq("essay_id", id)
     .order("created_at", { ascending: false })
     .limit(1);
 
@@ -253,7 +256,7 @@ export default async function EssayDetailPage({
 
         {/* conteúdo */}
         <div className="grid grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-12">
-          {/* texto / introdução */}
+          {/* texto */}
           <section className="lg:col-span-5">
             <div className="rounded-lg border border-slate-200 p-4">
               <div className="text-xs font-extrabold tracking-wide text-slate-700">
@@ -308,13 +311,13 @@ function CorrectionReport({
   const highlights = feedback?.highlights ?? [];
 
   function finalScoreClass(score: number) {
-  if (score === 0) return "bg-black text-white border-black";
-  if (score <= 200) return "bg-red-100 text-red-700 border-red-200";
-  if (score <= 400) return "bg-orange-100 text-orange-700 border-orange-200";
-  if (score <= 600) return "bg-amber-100 text-amber-800 border-amber-200";
-  if (score <= 800) return "bg-lime-100 text-lime-800 border-lime-200";
-  return "bg-emerald-100 text-emerald-700 border-emerald-200";
-}
+    if (score === 0) return "bg-black text-white border-black";
+    if (score <= 200) return "bg-red-100 text-red-700 border-red-200";
+    if (score <= 400) return "bg-orange-100 text-orange-700 border-orange-200";
+    if (score <= 600) return "bg-amber-100 text-amber-800 border-amber-200";
+    if (score <= 800) return "bg-lime-100 text-lime-800 border-lime-200";
+    return "bg-emerald-100 text-emerald-700 border-emerald-200";
+  }
 
   return (
     <div className="space-y-4">
@@ -340,7 +343,6 @@ function CorrectionReport({
                 Nota: {total}
               </span>
             )}
-
           </div>
         </div>
 
@@ -351,7 +353,7 @@ function CorrectionReport({
         )}
       </div>
 
-      {/* ✅ QUADRO ENTRE “CORREÇÃO” E “COMPETÊNCIAS” */}
+      {/* ✅ quadro */}
       {Array.isArray(competencias) && competencias.length > 0 && (
         <CriteriaDistributionTable competencias={competencias} />
       )}
@@ -376,7 +378,6 @@ function CorrectionReport({
                       {c.nome ?? `Competência ${idx + 1}`}
                     </div>
 
-                    {/* ✅ BADGE COM COR DINÂMICA */}
                     <div
                       className={[
                         "rounded-md border px-2 py-1 text-xs font-extrabold",
@@ -406,7 +407,8 @@ function CorrectionReport({
           </div>
         ) : (
           <div className="mt-3 text-sm text-slate-600">
-            Não foi possível exibir as competências (feedback ainda não está estruturado).
+            Não foi possível exibir as competências (feedback ainda não está
+            estruturado).
             <div className="mt-2 rounded-md bg-slate-50 border border-slate-200 p-3 text-xs whitespace-pre-wrap">
               {JSON.stringify(feedback, null, 2)}
             </div>
@@ -414,7 +416,7 @@ function CorrectionReport({
         )}
       </div>
 
-      {/* destaques de texto (opcional) */}
+      {/* destaques */}
       {Array.isArray(highlights) && highlights.length > 0 && (
         <div className="rounded-lg border border-slate-200 p-4">
           <div className="text-xs font-extrabold tracking-wide text-slate-700">
@@ -443,7 +445,7 @@ function CorrectionReport({
         </div>
       )}
 
-      {/* OBSERVAÇÕES (MARKDOWN) */}
+      {/* observações */}
       {feedback?.observacoes && (
         <section className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <h3 className="font-bold mb-2">Observações</h3>
