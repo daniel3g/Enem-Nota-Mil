@@ -272,7 +272,9 @@ export default function Home() {
             </nav>
 
             <div className="flex items-center gap-3 text-2xl text-slate-700">
+              <a href="https:instagram.com/enemnota_mil" target="_blank">
               <FiInstagram />
+              </a>
               <SlSocialYoutube />
             </div>
           </div>

@@ -1,18 +1,7 @@
-// components/SidebarDashboard.tsx
+// components/SidebarDashboard.tsx (SERVER)
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
-import Link from "next/link";
-import Image from "next/image";
-import { RxHome } from "react-icons/rx";
-import { BsFileText } from "react-icons/bs";
-import { PiBooksLight } from "react-icons/pi";
-import { MdAttachMoney } from "react-icons/md";
-import { RiStickyNoteAddLine } from "react-icons/ri";
-import { CgProfile } from "react-icons/cg";
-import { signOut } from "@/app/login/actions";
-import Logo from "../../public/images/logo.webp";
-import AvatarDefault from "../../public/images/avatar.png";
-import ClientBalanceBadge from "@/components/ClientBalanceBadge";
+import ClientSidebarDashboard from "@/components/ClientSidebarDashboard";
 
 export default async function SidebarDashboard({
   children,
@@ -24,16 +13,16 @@ export default async function SidebarDashboard({
 
   if (error || !data?.user) redirect("/login");
 
-  const user = data.user!;
+  const user = data.user;
 
-  // 🔽 busca nome e avatar do perfil
+  // perfil
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, avatar_url")
     .eq("id", user.id)
     .single();
 
-  // 🔽 saldo inicial de créditos vindo da view user_credit_balance
+  // saldo inicial
   let initial = 0;
   {
     const { data: balanceRow, error: balanceError } = await supabase
@@ -42,96 +31,19 @@ export default async function SidebarDashboard({
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (!balanceError && balanceRow?.balance != null) {
-      initial = balanceRow.balance;
-    }
+    if (!balanceError && balanceRow?.balance != null) initial = balanceRow.balance;
   }
 
   const firstName = profile?.full_name?.split(" ")[0] ?? "Usuário";
   const avatarUrl = profile?.avatar_url || null;
 
   return (
-    <div className="min-h-dvh bg-gray-100 text-gray-800">
-      <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white shadow-xl">
-        <div className="flex items-center p-3 px-5 border-b border-white/10">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <Image src={Logo} alt="Logo Enem Nota Mil" height={100} />
-          </Link>
-        </div>
-
-        <nav className="px-3 py-4 space-y-1">
-          <NavItem href="/dashboard" icon={<RxHome />} label="Meu painel" />
-          <NavItem href="/minhas-redacoes" icon={<BsFileText />} label="Minhas redações" />
-          <NavItem href="/redacao" icon={<RiStickyNoteAddLine />} label="Nova redação" />
-          <NavItem href="/ebooks" icon={<PiBooksLight />} label="Meus Ebooks" />
-          <NavItem href="/comprar" icon={<MdAttachMoney />} label="Comprar créditos" />
-          <NavItem href="/perfil" icon={<CgProfile />} label="Atualizar perfil" />
-        </nav>
-
-        <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
-          <div className="flex items-center gap-3">
-            {avatarUrl ? (
-              <Image
-                src={avatarUrl}
-                alt="Avatar"
-                width={96}
-                height={96}
-                unoptimized
-                className="rounded-full"
-              />
-            ) : (
-              <Image
-                src={AvatarDefault}
-                alt="Foto de perfil"
-                width={36}
-                height={36}
-                className="rounded-full"
-              />
-            )}
-
-            <div className="text-sm leading-5">
-              <div className="opacity-70">Bem-vindo,</div>
-              <div className="font-medium">{firstName}</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <ClientBalanceBadge initial={initial} />
-            <span className="text-sm">Créditos</span>
-          </div>
-
-          <form>
-            <button
-              className="w-full bg-customPurple rounded-md py-2 text-sm font-medium"
-              formAction={signOut}
-            >
-              Sair
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <main className="lg:pl-64 p-4 lg:p-8">{children}</main>
-    </div>
-  );
-}
-
-function NavItem({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition"
+    <ClientSidebarDashboard
+      firstName={firstName}
+      avatarUrl={avatarUrl}
+      initialCredits={initial}
     >
-      <span className="text-lg">{icon}</span>
-      <span className="font-medium">{label}</span>
-    </Link>
+      {children}
+    </ClientSidebarDashboard>
   );
 }

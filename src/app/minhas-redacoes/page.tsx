@@ -75,7 +75,7 @@ export default async function MinhasRedacoesPage() {
   const typedEssays = (essays ?? []) as Essay[];
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
+    <main className="mx-auto w-full px-4 py-8">
       {/* Topo */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="px-6 py-6">
@@ -116,17 +116,16 @@ export default async function MinhasRedacoesPage() {
 
         <div className="border-t border-slate-200" />
 
-        {/* Lista 1 por linha */}
+        {/* Lista 3 por linha */}
         <div className="px-6 py-6">
           {typedEssays.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-6">
               <p className="text-slate-700">Você ainda não enviou nenhuma redação.</p>
             </div>
           ) : (
-            <ul className="space-y-4">
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {typedEssays.map((e) => (
                 <li key={e.id}>
-                  {/* Card retangular por linha */}
                   <EssayCard essay={e} />
                 </li>
               ))}
