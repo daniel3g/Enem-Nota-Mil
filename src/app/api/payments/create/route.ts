@@ -5,6 +5,7 @@ import { asaas } from "../../../../../lib/asaas/client";
 
 const BodySchema = z.object({
   packageKey: z.enum(["p1", "p5", "p10"]),
+  billingType: z.enum(["PIX", "CREDIT_CARD"]),
 });
 
 const PACKS = {
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
 
     // 2) Body
     const body = await req.json();
-    const { packageKey } = BodySchema.parse(body);
+    const { packageKey, billingType } = BodySchema.parse(body);
     const pack = PACKS[packageKey];
 
     // 3) Garantir profile (agora incluindo cpf_cnpj)
@@ -126,11 +127,11 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4) Criar cobrança Asaas — trocando PIX -> UNDEFINED (ou BOLETO)
+    // 4) Criar cobrança Asaas somente com os meios permitidos
     const dueDate = addDays(new Date(), 3);
     const paymentPayload = {
       customer: profile.asaas_customer_id!,
-      billingType: "UNDEFINED", // evita restrição do PIX na sua conta sandbox
+      billingType,
       value: Number(pack.price.toFixed(2)),
       description: `${pack.description} - ${pack.credits} créditos`,
       dueDate,
@@ -151,8 +152,17 @@ export async function POST(req: Request) {
       asaasPayment?.invoiceUrl || asaasPayment?.bankSlipUrl || asaasPayment?.transactionReceiptUrl;
 
     if (!paymentId || !checkoutUrl) {
-      console.error("[payments/create] Asaas payment missing id/checkoutUrl:", asaasPayment);
-      return NextResponse.json({ error: "Falha ao gerar link de pagamento no Asaas." }, { status: 502 });
+      console.error("[payments/create] Asaas payment missing id/checkoutUrl:", {
+        billingType,
+        asaasPayment,
+      });
+      return NextResponse.json(
+        {
+          error: "Falha ao gerar link de pagamento no Asaas.",
+          details: "A resposta do Asaas nao retornou uma URL de checkout para o meio escolhido.",
+        },
+        { status: 502 }
+      );
     }
 
     // 5) Persistir em payments (pending)
@@ -164,6 +174,7 @@ export async function POST(req: Request) {
       amount_cents: toCents(pack.price),
       raw: {
         asaasPayment,
+        billingType,
         package: { key: packageKey, ...pack },
         created_by_route: "/api/payments/create",
       },

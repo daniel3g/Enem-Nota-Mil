@@ -2,15 +2,18 @@
 "use client";
 import { useState } from "react";
 
+type BillingType = "PIX" | "CREDIT_CARD";
+
 export default function Comprar() {
   const [waiting, setWaiting] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("");
+  const [billingType, setBillingType] = useState<BillingType>("PIX");
 
   async function buy(packageKey: "p1"|"p5"|"p10") {
     const r = await fetch("/api/payments/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ packageKey }),
+      body: JSON.stringify({ packageKey, billingType }),
     });
     const j = await r.json();
     if (!r.ok) {
@@ -63,6 +66,38 @@ export default function Comprar() {
     <div className="flex flex-col w-full m-8 my-3 bg-white border-t-4 rounded-lg border-customGreen p-6 space-y-4">
       <strong className="text-xl text-customGreen">PREÇOS</strong>
       <h2 className="text-3xl font-heading font-extrabold">PACOTES E PLANOS</h2>
+      <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+        <span className="text-sm font-semibold uppercase tracking-wide text-zinc-700">
+          Forma de pagamento
+        </span>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setBillingType("PIX")}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold ${
+              billingType === "PIX"
+                ? "border-customPurple bg-customPurple text-white"
+                : "border-zinc-300 bg-white text-zinc-700"
+            }`}
+          >
+            Pix
+          </button>
+          <button
+            type="button"
+            onClick={() => setBillingType("CREDIT_CARD")}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold ${
+              billingType === "CREDIT_CARD"
+                ? "border-customPurple bg-customPurple text-white"
+                : "border-zinc-300 bg-white text-zinc-700"
+            }`}
+          >
+            Cartão de crédito
+          </button>
+        </div>
+        <p className="text-sm text-zinc-600">
+          O checkout do Asaas será aberto já com {billingType === "PIX" ? "Pix" : "cartão de crédito"}.
+        </p>
+      </div>
       <hr />
       <div className="flex w-full gap-6">
         <div className="flex flex-col p-5 w-1/3 border border-zinc-200 rounded-lg gap-1">
