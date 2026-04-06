@@ -1,5 +1,7 @@
 'use server'
 
+import { getAuthErrorMessage } from '@/lib/auth-error-message'
+
 import { createClient } from '../../../utils/supabase/server'
 
 export async function signup(formData: FormData): Promise<{ error: Error | null }> {
@@ -15,12 +17,17 @@ export async function signup(formData: FormData): Promise<{ error: Error | null 
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/email-confirm`,
-      data: { full_name, phone }, // <- grava nos metadados do usuário
+      data: { full_name, phone },
     },
   })
 
   if (error || !data?.user?.id) {
-    return { error: error ?? new Error('Erro ao cadastrar usuário') }
+    return {
+      error:
+        error != null
+          ? new Error(getAuthErrorMessage(error.message))
+          : new Error('Não foi possível concluir seu cadastro agora. Tente novamente.'),
+    }
   }
 
   await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/create-profile`, {

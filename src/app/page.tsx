@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import logo from "../../public/images/logo.webp";
+import logo from "../../public/images/logo-enem-nota-mil-2026.png";
 
 // ✅ Troque essas imagens pelas suas (vou ajustar quando você mandar)
 import heroLeft from "../../public/images/bg-hero-2.jpg"; // imagem grande do lado esquerdo do hero
@@ -20,7 +20,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
-            <Image src={logo} alt="ENEM Nota Mil" height={44} priority />
+            <Image src={logo} alt="ENEM Nota Mil" height={80} priority />
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-700 md:flex">
@@ -250,7 +250,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-6 border-t border-black/5 pt-8 md:flex-row">
             <div className="flex items-center gap-3">
-              <Image src={logo} alt="ENEM Nota Mil" height={40} />
+              <Image src={logo} alt="ENEM Nota Mil" height={80} />
             </div>
 
             <nav className="flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-slate-600">

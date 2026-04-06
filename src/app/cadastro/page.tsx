@@ -1,14 +1,13 @@
 'use client'
 
-import { signup } from './actions'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { LuEyeClosed, LuEye } from "react-icons/lu"
+import Image from 'next/image'
 
-import Image from "next/image";
-import logo from '../../../public/images/logo.webp';
+import { signup } from './actions'
+import { LuEyeClosed, LuEye } from 'react-icons/lu'
+import logo from '../../../public/images/logo-enem-nota-mil-2026.png'
 import ImageStudent from '../../../public/images/bg-login.webp'
 
 export default function LoginPage() {
@@ -67,34 +66,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='flex w-full h-full'>
-      <div className='hidden sm:block w-2/3 h-screen relative'>
-        <div className='absolute inset-0 w-full h-full'>
+    <div className='flex h-full w-full'>
+      <div className='relative hidden h-screen w-2/3 sm:block'>
+        <div className='absolute inset-0 h-full w-full'>
           <Image
             src={ImageStudent}
-            alt="Astronauta do Futuro Estudai"
-            layout="fill"
-            objectFit="cover"
-            className="-z-10 brightness-50"
+            alt='Astronauta do Futuro Estudai'
+            fill
+            className='-z-10 object-cover brightness-50'
           />
         </div>
       </div>
 
-      <div className='flex flex-col w-full justify-center items-center sm:w-1/3'>
+      <div className='flex w-full flex-col items-center justify-center sm:w-1/3'>
         <a href='/'>
           <Image
             src={logo}
-            alt="Logo Enem Nota Mil"
-            height={60}
+            alt='Logo Enem Nota Mil'
+            height={160}
           />
         </a>
 
-        <form className='flex flex-col w-full p-3 sm:w-96' onSubmit={handleSubmit}>
+        <form className='flex w-full flex-col p-3 sm:w-96' onSubmit={handleSubmit}>
           <h2 className='mb-8 text-lg'>Cadastre-se agora</h2>
 
-          <label htmlFor='nome' className='text-gray-500 text-sm'>Nome Completo:</label>
+          <label htmlFor='nome' className='text-sm text-gray-500'>Nome Completo:</label>
           <input
-            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            className='mb-5 flex rounded-sm bg-gray-200 p-3 focus:outline-none focus:ring focus:ring-primary_blue'
             placeholder='Seu nome completo'
             id='nome'
             name='nome'
@@ -102,9 +100,9 @@ export default function LoginPage() {
             required
           />
 
-          <label htmlFor='phone' className='text-gray-500 text-sm'>Celular:</label>
+          <label htmlFor='phone' className='text-sm text-gray-500'>Celular:</label>
           <input
-            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            className='mb-5 flex rounded-sm bg-gray-200 p-3 focus:outline-none focus:ring focus:ring-primary_blue'
             placeholder='(11) 91234-5678'
             id='phone'
             name='phone'
@@ -112,9 +110,9 @@ export default function LoginPage() {
             required
           />
 
-          <label htmlFor='email' className='text-gray-500 text-sm'>Email:</label>
+          <label htmlFor='email' className='text-sm text-gray-500'>Email:</label>
           <input
-            className='flex bg-gray-200 p-3 mb-5 focus:outline-none focus:ring focus:ring-primary_blue rounded-sm'
+            className='mb-5 flex rounded-sm bg-gray-200 p-3 focus:outline-none focus:ring focus:ring-primary_blue'
             placeholder='Seu e-mail'
             id='email'
             name='email'
@@ -122,10 +120,10 @@ export default function LoginPage() {
             required
           />
 
-          <label htmlFor='password' className='text-gray-500 text-sm'>Senha:</label>
-          <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <label htmlFor='password' className='text-sm text-gray-500'>Senha:</label>
+          <div className='relative mb-5 flex rounded-sm bg-gray-200 focus-within:ring focus-within:ring-primary_blue'>
             <input
-              className='w-full bg-gray-200 m-auto p-3 bg-transparent focus:outline-none'
+              className='m-auto w-full bg-transparent p-3 focus:outline-none'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='password'
               name='password'
@@ -135,16 +133,16 @@ export default function LoginPage() {
             <button
               type='button'
               onClick={togglePasswordVisibility}
-              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
+              className='absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 hover:text-gray-700 focus:outline-none'
             >
               {showPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
-          <label htmlFor='confirmPassword' className='text-gray-500 text-sm'>Confirmar Senha:</label>
-          <div className='relative bg-gray-200 flex mb-5 focus-within:ring focus-within:ring-primary_blue rounded-sm'>
+          <label htmlFor='confirmPassword' className='text-sm text-gray-500'>Confirmar Senha:</label>
+          <div className='relative mb-5 flex rounded-sm bg-gray-200 focus-within:ring focus-within:ring-primary_blue'>
             <input
-              className='w-full bg-gray-200 m-auto p-3 sm:w-96 bg-transparent focus:outline-none'
+              className='m-auto w-full bg-transparent p-3 focus:outline-none sm:w-96'
               placeholder='Deve ter no mínimo 8 caracteres'
               id='confirmPassword'
               name='confirmPassword'
@@ -154,33 +152,35 @@ export default function LoginPage() {
             <button
               type='button'
               onClick={toggleConfirmPasswordVisibility}
-              className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
+              className='absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 hover:text-gray-700 focus:outline-none'
             >
               {showConfirmPassword ? <LuEyeClosed /> : <LuEye />}
             </button>
           </div>
 
           {error && (
-            <p className='text-red-500 text-sm mb-3'>
-              {error}
-            </p>
+            <div className='mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700'>
+              <p className='font-semibold'>Não foi possível concluir seu cadastro.</p>
+              <p className='mt-1'>{error}</p>
+            </div>
           )}
 
-          <p className='text-gray-500 text-xs mb-5'>
+          <p className='mb-5 text-xs text-gray-500'>
             Ao se cadastrar, você aceita nossos termos de uso e a nossa política de privacidade.
           </p>
 
           <button
             type='submit'
             disabled={isLoading}
-            className={`bg-customPurple p-4 rounded-sm mt-2 text-xl text-white w-full
-              ${isLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+            className={`bg-customPurple mt-2 w-full rounded-sm p-4 text-xl text-white ${
+              isLoading ? 'cursor-not-allowed opacity-60' : ''
+            }`}
           >
             {isLoading ? 'Cadastrando...' : 'Cadastrar'}
           </button>
 
           <a href='/login'>
-            <div className='flex bg-gray-200 flex-col sm:w-full p-4 mt-5 rounded-md'>
+            <div className='mt-5 flex flex-col rounded-md bg-gray-200 p-4 sm:w-full'>
               <p className='text-gray-500'>Já possui uma conta?</p>
               <p className='text-primary_blue'>Entre na plataforma!</p>
             </div>

@@ -3,16 +3,19 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+import { getAuthErrorMessage } from '@/lib/auth-error-message'
 import { createClient } from '../../../utils/supabase/server'
 
+type LoginFormState = {
+  error: string | null
+}
 
-
-
-export async function login(formData: FormData) {
+export async function login(
+  _prevState: LoginFormState,
+  formData: FormData
+): Promise<LoginFormState> {
   const supabase = await createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -21,7 +24,7 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/error')
+    return { error: getAuthErrorMessage(error.message) }
   }
 
   revalidatePath('/', 'layout')
@@ -31,8 +34,6 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -41,7 +42,7 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data)
 
   if (error) {
-    redirect('/error')
+    redirect(`/error?type=signup&message=${encodeURIComponent(getAuthErrorMessage(error.message))}`)
   }
 
   revalidatePath('/', 'layout')

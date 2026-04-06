@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient as createSupabaseServer } from "../../../../../utils/supabase/server";
-import { asaas } from "../../../../../lib/asaas/client";
+import { asaas, asaasEnvDebug } from "../../../../../lib/asaas/client";
 
 const BodySchema = z.object({
   packageKey: z.enum(["p1", "p5", "p10"]),
@@ -26,11 +26,16 @@ export async function POST(req: Request) {
 
   console.log(
     "[payments/create] ENV CHECK:",
-    "ASAAS_BASE_URL:", process.env.ASAAS_BASE_URL,
-    "ASAAS_API_KEY_LEN:", process.env.ASAAS_API_KEY?.length ?? 0
+    "ASAAS_BASE_URL:", asaasEnvDebug.baseURL,
+    "ASAAS_API_KEY_LEN:", asaasEnvDebug.accessTokenLength,
+    "ASAAS_API_KEY_PREFIX:", asaasEnvDebug.accessTokenPrefix,
+    "ASAAS_API_KEY_SUFFIX:", asaasEnvDebug.accessTokenSuffix,
+    "ASAAS_API_KEY_HAS_LEADING_BACKSLASH:", asaasEnvDebug.hasLeadingBackslash,
+    "ASAAS_API_KEY_HAS_LEADING_DOLLAR:", asaasEnvDebug.hasLeadingDollar,
+    "ASAAS_API_KEY_HAS_WHITESPACE:", asaasEnvDebug.hasWhitespace
   );
 
-  if (!process.env.ASAAS_API_KEY || !process.env.ASAAS_BASE_URL) {
+  if (!asaasEnvDebug.accessTokenLength || !asaasEnvDebug.baseURL) {
     return NextResponse.json(
       { error: "Configuração do Asaas ausente. Defina ASAAS_API_KEY e ASAAS_BASE_URL no .env.local" },
       { status: 500 }

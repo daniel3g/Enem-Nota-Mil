@@ -15,7 +15,7 @@ import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { HiXMark } from "react-icons/hi2";
 
 import { signOut } from "@/app/login/actions";
-import Logo from "../../public/images/logo.webp";
+import Logo from "../../public/images/logo-enem-nota-mil-2026.png";
 import AvatarDefault from "../../public/images/avatar.png";
 import ClientBalanceBadge from "@/components/ClientBalanceBadge";
 
@@ -75,7 +75,7 @@ export default function ClientSidebarDashboard({
         
 
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Image src={Logo} alt="Logo" height={42} priority />
+          <Image src={Logo} alt="Logo" height={82} priority />
         </Link>
 
         <button
@@ -182,7 +182,7 @@ export default function ClientSidebarDashboard({
       <aside className="hidden lg:block fixed inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white shadow-xl">
         <div className="flex items-center p-3 px-5 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <Image src={Logo} alt="Logo Enem Nota Mil" height={100} />
+            <Image src={Logo} alt="Logo Enem Nota Mil" height={120} />
           </Link>
         </div>
 

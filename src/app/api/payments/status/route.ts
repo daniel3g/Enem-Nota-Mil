@@ -61,6 +61,11 @@ async function syncPaymentWithAsaas(payment: {
   };
 
   if (PAID_STATUSES.has(remoteStatus)) {
+    console.log("[payments/status] syncing paid payment from Asaas:", {
+      externalId: payment.external_id,
+      remoteStatus,
+    });
+
     await supabaseAdmin
       .from("payments")
       .update({ status: "paid", raw: mergedRaw })
@@ -83,6 +88,11 @@ async function syncPaymentWithAsaas(payment: {
         .maybeSingle();
 
       if (!existingCredit) {
+        console.log("[payments/status] inserting credits from status sync:", {
+          externalId: payment.external_id,
+          credits,
+        });
+
         await supabaseAdmin.from("credit_transactions").insert({
           user_id: payment.user_id,
           type: CREDIT_TYPE_PURCHASE,

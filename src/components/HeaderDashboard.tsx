@@ -8,7 +8,7 @@ import { PiBooksLight } from "react-icons/pi"
 import { MdAttachMoney } from "react-icons/md";
 
 import Image from 'next/image'
-import Logo from '../../public/images/logo.webp'
+import Logo from '../../public/images/logo-enem-nota-mil-2026.png'
 import AvatarDefault from '../../public/images/avatar.png'
 
 import ClientBalanceBadge from "../components/ClientBalanceBadge";
@@ -54,7 +54,7 @@ export default async function PrivatePage() {
       <header className='flex p-4 border-b items-center'>
         <div className='flex w-1/4'>
           <Link href="/dashboard">
-            <Image src={Logo} alt='Logo Enem Nota Mil' height={60} />
+            <Image src={Logo} alt='Logo Enem Nota Mil' height={80} />
           </Link>
         </div>
         <div className='flex w-1/2 gap-2'>
