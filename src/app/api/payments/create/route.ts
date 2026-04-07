@@ -21,6 +21,34 @@ function addDays(base: Date, days: number) {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
+function getAsaasErrorCode(err: any) {
+  return err?.response?.data?.errors?.[0]?.code;
+}
+
+function isInvalidAsaasCustomer(err: any) {
+  return getAsaasErrorCode(err) === "invalid_customer";
+}
+
+async function createAsaasCustomer(params: {
+  name: string;
+  email?: string;
+  cpfCnpj: string;
+}) {
+  const customer = await asaas.post("/customers", {
+    name: params.name,
+    email: params.email,
+    cpfCnpj: params.cpfCnpj,
+  });
+
+  const asaasId: string | undefined = customer?.data?.id;
+  if (!asaasId) {
+    console.error("[payments/create] Asaas customer response without id:", customer?.data);
+    throw new Error("Falha ao criar cliente no Asaas.");
+  }
+
+  return asaasId;
+}
+
 export async function POST(req: Request) {
   const supabase = await createSupabaseServer();
 
@@ -46,6 +74,8 @@ export async function POST(req: Request) {
     // 1) Auth
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = user.id;
+    const userEmail = user.email;
 
     // 2) Body
     const body = await req.json();
@@ -56,19 +86,19 @@ export async function POST(req: Request) {
     let { data: profile, error: pErr } = await supabase
       .from("profiles")
       .select("id, full_name, cpf_cnpj, asaas_customer_id")
-      .eq("id", user.id)
+      .eq("id", userId)
       .single();
 
     if (pErr || !profile) {
       const fallbackName =
         (user.user_metadata?.full_name as string) ||
         (user.user_metadata?.name as string) ||
-        (user.email?.split("@")[0] as string) ||
+        (userEmail?.split("@")[0] as string) ||
         "Usuário";
 
       const { data: upserted, error: upErr } = await supabase
         .from("profiles")
-        .upsert({ id: user.id, full_name: fallbackName }, { onConflict: "id" })
+        .upsert({ id: userId, full_name: fallbackName }, { onConflict: "id" })
         .select("id, full_name, cpf_cnpj, asaas_customer_id")
         .single();
 
@@ -87,40 +117,41 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3.2 Garantir customer Asaas com cpfCnpj
-    if (!profile.asaas_customer_id) {
-      const fallbackName =
-        profile.full_name ||
-        (user.user_metadata?.full_name as string) ||
-        (user.user_metadata?.name as string) ||
-        (user.email?.split("@")[0] as string) ||
-        "Usuário";
+    const fallbackName =
+      profile.full_name ||
+      (user.user_metadata?.full_name as string) ||
+      (user.user_metadata?.name as string) ||
+      (userEmail?.split("@")[0] as string) ||
+      "Usuario";
 
-      console.log("[payments/create] creating Asaas customer for:", user.email);
-
-      const customer = await asaas.post("/customers", {
-        name: fallbackName,
-        email: user.email,
-        cpfCnpj: profile.cpf_cnpj, // << envia CPF/CNPJ
-      });
-
-      const asaasId: string | undefined = customer?.data?.id;
-      if (!asaasId) {
-        console.error("[payments/create] Asaas customer response without id:", customer?.data);
-        return NextResponse.json({ error: "Falha ao criar cliente no Asaas." }, { status: 502 });
-      }
-
+    async function persistAsaasCustomerId(asaasId: string) {
       const { error: updErr } = await supabase
         .from("profiles")
         .update({ asaas_customer_id: asaasId })
-        .eq("id", user.id);
+        .eq("id", userId);
 
       if (updErr) {
         console.error("[payments/create] failed to persist asaas_customer_id:", updErr);
-        return NextResponse.json({ error: "Falha ao vincular asaas_customer_id ao perfil." }, { status: 400 });
+        return false;
       }
 
-      profile.asaas_customer_id = asaasId;
+      profile!.asaas_customer_id = asaasId;
+      return true;
+    }
+
+    // 3.2 Garantir customer Asaas com cpfCnpj
+    if (!profile.asaas_customer_id) {
+      console.log("[payments/create] creating Asaas customer for:", userEmail);
+
+      const asaasId = await createAsaasCustomer({
+        name: fallbackName,
+        email: userEmail,
+        cpfCnpj: profile.cpf_cnpj,
+      });
+
+      if (!(await persistAsaasCustomerId(asaasId))) {
+        return NextResponse.json({ error: "Falha ao vincular asaas_customer_id ao perfil." }, { status: 400 });
+      }
     } else {
       // Se já existe customer e o CPF/CNPJ não está no Asaas, tentamos atualizar (best-effort)
       try {
@@ -128,7 +159,21 @@ export async function POST(req: Request) {
           cpfCnpj: profile.cpf_cnpj,
         });
       } catch (e: any) {
-        console.warn("[payments/create] warn: failed to update cpfCnpj on Asaas (continuando):", e?.response?.data ?? e);
+        if (isInvalidAsaasCustomer(e)) {
+          console.warn("[payments/create] existing Asaas customer is invalid; recreating:", profile.asaas_customer_id);
+
+          const asaasId = await createAsaasCustomer({
+            name: fallbackName,
+            email: userEmail,
+            cpfCnpj: profile.cpf_cnpj,
+          });
+
+          if (!(await persistAsaasCustomerId(asaasId))) {
+            return NextResponse.json({ error: "Falha ao vincular novo asaas_customer_id ao perfil." }, { status: 400 });
+          }
+        } else {
+          console.warn("[payments/create] warn: failed to update cpfCnpj on Asaas (continuando):", e?.response?.data ?? e);
+        }
       }
     }
 
@@ -140,7 +185,7 @@ export async function POST(req: Request) {
       value: Number(pack.price.toFixed(2)),
       description: `${pack.description} - ${pack.credits} créditos`,
       dueDate,
-      externalReference: `${user.id}:${packageKey}:${Date.now()}`,
+      externalReference: `${userId}:${packageKey}:${Date.now()}`,
     };
 
     console.log("[payments/create] creating Asaas payment:", {
@@ -150,7 +195,27 @@ export async function POST(req: Request) {
       dueDate: paymentPayload.dueDate,
     });
 
-    const { data: asaasPayment } = await asaas.post("/payments", paymentPayload);
+    let asaasPayment;
+    try {
+      ({ data: asaasPayment } = await asaas.post("/payments", paymentPayload));
+    } catch (e: any) {
+      if (!isInvalidAsaasCustomer(e)) throw e;
+
+      console.warn("[payments/create] invalid_customer while creating payment; recreating customer and retrying:", profile.asaas_customer_id);
+
+      const asaasId = await createAsaasCustomer({
+        name: fallbackName,
+        email: userEmail,
+        cpfCnpj: profile.cpf_cnpj,
+      });
+
+      if (!(await persistAsaasCustomerId(asaasId))) {
+        return NextResponse.json({ error: "Falha ao vincular novo asaas_customer_id ao perfil." }, { status: 400 });
+      }
+
+      paymentPayload.customer = asaasId;
+      ({ data: asaasPayment } = await asaas.post("/payments", paymentPayload));
+    }
 
     const paymentId: string | undefined = asaasPayment?.id;
     const checkoutUrl: string | undefined =
@@ -172,7 +237,7 @@ export async function POST(req: Request) {
 
     // 5) Persistir em payments (pending)
     const { error: insErr } = await supabase.from("payments").insert({
-      user_id: user.id,
+      user_id: userId,
       provider: "asaas",
       external_id: paymentId,
       status: "pending",
