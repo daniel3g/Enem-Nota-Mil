@@ -24,14 +24,15 @@ type Props = {
   firstName: string;
   avatarUrl: string | null;
   initialCredits: number;
+  isAdmin?: boolean;
 };
 
 const NAV = [
   { href: "/dashboard", label: "Meu painel", icon: <RxHome /> },
-  { href: "/minhas-redacoes", label: "Minhas redações", icon: <BsFileText /> },
-  { href: "/redacao", label: "Nova redação", icon: <RiStickyNoteAddLine /> },
+  { href: "/minhas-redacoes", label: "Minhas redacoes", icon: <BsFileText /> },
+  { href: "/redacao", label: "Nova redacao", icon: <RiStickyNoteAddLine /> },
   { href: "/ebooks", label: "Meus Ebooks", icon: <PiBooksLight /> },
-  { href: "/comprar", label: "Comprar créditos", icon: <MdAttachMoney /> },
+  { href: "/comprar", label: "Comprar creditos", icon: <MdAttachMoney /> },
   { href: "/perfil", label: "Atualizar perfil", icon: <CgProfile /> },
 ];
 
@@ -40,16 +41,25 @@ export default function ClientSidebarDashboard({
   firstName,
   avatarUrl,
   initialCredits,
+  isAdmin = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const navItems = isAdmin
+    ? [
+        ...NAV,
+        {
+          href: "/dashboard/admin/temas",
+          label: "Cadastrar temas",
+          icon: <RiStickyNoteAddLine />,
+        },
+      ]
+    : NAV;
 
-  // Fecha ao trocar de rota
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  // Trava o scroll do body quando drawer abre
   useEffect(() => {
     if (!open) return;
     const original = document.body.style.overflow;
@@ -59,7 +69,6 @@ export default function ClientSidebarDashboard({
     };
   }, [open]);
 
-  // Fecha ao apertar ESC
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
@@ -70,10 +79,7 @@ export default function ClientSidebarDashboard({
 
   return (
     <div className="min-h-dvh bg-gray-100 text-gray-800">
-      {/* TOP BAR (mobile) */}
-      <header className="sticky top-0 z-50 flex items-center justify-between gap-3 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-3 lg:hidden">
-        
-
+      <header className="sticky top-0 z-50 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Image src={Logo} alt="Logo" height={82} priority />
         </Link>
@@ -88,7 +94,6 @@ export default function ClientSidebarDashboard({
         </button>
       </header>
 
-      {/* OVERLAY (mobile) */}
       <div
         className={[
           "fixed inset-0 z-40 bg-black/50 transition-opacity lg:hidden",
@@ -98,16 +103,15 @@ export default function ClientSidebarDashboard({
         aria-hidden="true"
       />
 
-      {/* DRAWER SIDEBAR (mobile) */}
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-50 w-[75vw] max-w-[320px] bg-[#111827] text-white shadow-2xl transform transition-transform duration-300 lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-[75vw] max-w-[320px] transform bg-[#111827] text-white shadow-2xl transition-transform duration-300 lg:hidden",
           open ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between p-3 px-5 border-b border-white/10">
+        <div className="flex items-center justify-between border-b border-white/10 p-3 px-5">
           <Link href="/dashboard" className="flex items-center gap-3">
             <Image src={Logo} alt="Logo Enem Nota Mil" height={90} />
           </Link>
@@ -121,8 +125,8 @@ export default function ClientSidebarDashboard({
           </button>
         </div>
 
-        <nav className="px-3 py-4 space-y-1">
-          {NAV.map((item) => (
+        <nav className="space-y-1 px-3 py-4">
+          {navItems.map((item) => (
             <NavItem
               key={item.href}
               href={item.href}
@@ -134,7 +138,7 @@ export default function ClientSidebarDashboard({
           ))}
         </nav>
 
-        <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
+        <div className="absolute bottom-0 w-full space-y-3 border-t border-white/10 p-4">
           <div className="flex items-center gap-3">
             {avatarUrl ? (
               <Image
@@ -163,12 +167,12 @@ export default function ClientSidebarDashboard({
 
           <div className="flex items-center gap-2">
             <ClientBalanceBadge initial={initialCredits} />
-            <span className="text-sm">Créditos</span>
+            <span className="text-sm">Creditos</span>
           </div>
 
           <form>
             <button
-              className="w-full bg-customPurple rounded-md py-2 text-sm font-medium"
+              className="w-full rounded-md bg-customPurple py-2 text-sm font-medium"
               formAction={signOut}
               onClick={() => setOpen(false)}
             >
@@ -178,16 +182,15 @@ export default function ClientSidebarDashboard({
         </div>
       </aside>
 
-      {/* SIDEBAR DESKTOP (igual ao seu, fixa) */}
-      <aside className="hidden lg:block fixed inset-y-0 left-0 z-40 w-64 bg-[#111827] text-white shadow-xl">
-        <div className="flex items-center p-3 px-5 border-b border-white/10">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 bg-[#111827] text-white shadow-xl lg:block">
+        <div className="flex items-center border-b border-white/10 p-3 px-5">
           <Link href="/dashboard" className="flex items-center gap-3">
             <Image src={Logo} alt="Logo Enem Nota Mil" height={120} />
           </Link>
         </div>
 
-        <nav className="px-3 py-4 space-y-1">
-          {NAV.map((item) => (
+        <nav className="space-y-1 px-3 py-4">
+          {navItems.map((item) => (
             <NavItem
               key={item.href}
               href={item.href}
@@ -198,7 +201,7 @@ export default function ClientSidebarDashboard({
           ))}
         </nav>
 
-        <div className="absolute bottom-0 w-full p-4 border-t border-white/10 space-y-3">
+        <div className="absolute bottom-0 w-full space-y-3 border-t border-white/10 p-4">
           <div className="flex items-center gap-3">
             {avatarUrl ? (
               <Image
@@ -227,12 +230,12 @@ export default function ClientSidebarDashboard({
 
           <div className="flex items-center gap-2">
             <ClientBalanceBadge initial={initialCredits} />
-            <span className="text-sm">Créditos</span>
+            <span className="text-sm">Creditos</span>
           </div>
 
           <form>
             <button
-              className="w-full bg-customPurple rounded-md py-2 text-sm font-medium"
+              className="w-full rounded-md bg-customPurple py-2 text-sm font-medium"
               formAction={signOut}
             >
               Sair
@@ -241,8 +244,7 @@ export default function ClientSidebarDashboard({
         </div>
       </aside>
 
-      {/* CONTEÚDO */}
-      <main className="lg:pl-64 p-4 lg:p-8">{children}</main>
+      <main className="p-4 lg:pl-64 lg:p-8">{children}</main>
     </div>
   );
 }
@@ -265,7 +267,7 @@ function NavItem({
       href={href}
       onClick={onClick}
       className={[
-        "flex items-center gap-3 px-3 py-2 rounded-lg transition",
+        "flex items-center gap-3 rounded-lg px-3 py-2 transition",
         active ? "bg-white/15" : "hover:bg-white/10",
       ].join(" ")}
     >

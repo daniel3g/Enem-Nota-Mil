@@ -1,4 +1,3 @@
-// components/SidebarDashboard.tsx (SERVER)
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
 import ClientSidebarDashboard from "@/components/ClientSidebarDashboard";
@@ -15,14 +14,12 @@ export default async function SidebarDashboard({
 
   const user = data.user;
 
-  // perfil
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, avatar_url")
+    .select("full_name, avatar_url, role")
     .eq("id", user.id)
     .single();
 
-  // saldo inicial
   let initial = 0;
   {
     const { data: balanceRow, error: balanceError } = await supabase
@@ -34,14 +31,16 @@ export default async function SidebarDashboard({
     if (!balanceError && balanceRow?.balance != null) initial = balanceRow.balance;
   }
 
-  const firstName = profile?.full_name?.split(" ")[0] ?? "Usuário";
+  const firstName = profile?.full_name?.split(" ")[0] ?? "Usuario";
   const avatarUrl = profile?.avatar_url || null;
+  const isAdmin = profile?.role === "admin";
 
   return (
     <ClientSidebarDashboard
       firstName={firstName}
       avatarUrl={avatarUrl}
       initialCredits={initial}
+      isAdmin={isAdmin}
     >
       {children}
     </ClientSidebarDashboard>
