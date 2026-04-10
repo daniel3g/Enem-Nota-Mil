@@ -11,6 +11,7 @@ import { PiBooksLight } from "react-icons/pi";
 import { MdAttachMoney } from "react-icons/md";
 import { RiStickyNoteAddLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
+import { FiUsers } from "react-icons/fi";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { HiXMark } from "react-icons/hi2";
 
@@ -52,6 +53,11 @@ export default function ClientSidebarDashboard({
           href: "/dashboard/admin/temas",
           label: "Cadastrar temas",
           icon: <RiStickyNoteAddLine />,
+        },
+        {
+          href: "/dashboard/admin/usuarios",
+          label: "Usuarios",
+          icon: <FiUsers />,
         },
       ]
     : NAV;
